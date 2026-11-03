@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Administration des accès</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F7FB}
+a{color:#4A5163}a:hover{color:#14161F}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Manrope, system-ui, sans-serif; color: #14161F; background: #F6F7FB">
+  <nav aria-label="Navigation principale" style="flex: 1 1 232px; max-width: 100%; background: #FFFFFF; color: #14161F; border-right: 1px solid #E3E6EE; padding: 28px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 9px; background: #3448E0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">D</span>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 17px">Devis &amp; Factures</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 600">
+      <a href="Dashboard.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Tableau de bord</a>
+      <a href="Devis.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Devis</a>
+      <a href="Facturation.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Factures</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Clients</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Lignes types</a>
+      <a href="Profil.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Profil entreprise</a>
+    </div>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 600">
+      <a href="Admin.dc.html" aria-current="page" style="padding: 11px 12px; border-radius: 10px; text-decoration: none; background: #EBEEFF; color: #2233B8">Accès (superadmin)</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 32px 64px; box-sizing: border-box">
+    <div style="max-width: 980px; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #3448E0">Superadmin</span>
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 38px; letter-spacing: -0.02em">Accès autorisés</h1>
+        <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #5B6273; max-width: 640px">Seules ces adresses Google peuvent se connecter. Retirer une adresse coupe l’accès immédiatement ; les devis et factures de la personne sont conservés.</p>
+      </div>
+
+      <form style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 16px; padding: 20px">
+        <label style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">
+          Adresse Gmail à autoriser
+          <input type="email" placeholder="prenom.nom@gmail.com" style="height: 48px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 14px; font-family: inherit; font-size: 15px">
+        </label>
+        <button type="button" style="height: 48px; padding: 0 22px; border-radius: 12px; border: none; background: #3448E0; color: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer">Autoriser</button>
+      </form>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 16px; overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 15px; min-width: 640px">
+          <thead>
+            <tr style="text-align: left; color: #5B6273; font-size: 13px">
+              <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Adresse</th>
+              <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Entreprise</th>
+              <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Dernière connexion</th>
+              <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE"><span style="position: absolute; left: -9999px">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; font-weight: 600">anto@gmail.com <span style="margin-left: 8px; font-size: 12px; font-weight: 700; color: #2233B8; background: #EBEEFF; padding: 3px 8px; border-radius: 999px">superadmin</span></td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; color: #5B6273">—</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; color: #5B6273">aujourd’hui</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5"></td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; font-weight: 600">karim.elec@gmail.com</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5">Benali Électricité</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; color: #5B6273">hier, 18 h 42</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; text-align: right"><button type="button" style="height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid #E5B9B4; background: #FFFFFF; color: #A12A1E; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer">Retirer</button></td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; font-weight: 600">lea.graphisme@gmail.com</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5">Léa Morel – Studio</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; color: #5B6273">28 oct. 2026</td>
+              <td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F5; text-align: right"><button type="button" style="height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid #E5B9B4; background: #FFFFFF; color: #A12A1E; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer">Retirer</button></td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600">s.durand.plomberie@gmail.com</td>
+              <td style="padding: 16px 20px; color: #5B6273"><span style="font-size: 13px; font-weight: 700; color: #8A5300; background: #FFF1DC; padding: 3px 8px; border-radius: 999px">jamais connecté</span></td>
+              <td style="padding: 16px 20px; color: #5B6273">—</td>
+              <td style="padding: 16px 20px; text-align: right"><button type="button" style="height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid #E5B9B4; background: #FFFFFF; color: #A12A1E; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer">Retirer</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

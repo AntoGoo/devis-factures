@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Facturation d’un devis accepté</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F7FB}
+a{color:#4A5163}a:hover{color:#14161F}
+input{font-family:Manrope,system-ui,sans-serif;color:#14161F}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Manrope, system-ui, sans-serif; color: #14161F; background: #F6F7FB">
+  <nav aria-label="Navigation principale" style="flex: 1 1 232px; max-width: 100%; background: #FFFFFF; color: #14161F; border-right: 1px solid #E3E6EE; padding: 28px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 9px; background: #3448E0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">D</span>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 17px">Devis &amp; Factures</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 600">
+      <a href="Dashboard.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Tableau de bord</a>
+      <a href="Devis.dc.html" aria-current="page" style="padding: 11px 12px; border-radius: 10px; text-decoration: none; background: #EBEEFF; color: #2233B8">Devis</a>
+      <a href="Facturation.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Factures</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Clients</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Lignes types</a>
+      <a href="Profil.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Profil entreprise</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 32px 64px; box-sizing: border-box">
+    <div style="max-width: 1080px; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+            <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -0.02em">D-2026-015</h1>
+            <span style="padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #2233B8; background: #EBEEFF">Accepté le 22 oct. 2026</span>
+          </div>
+          <p style="margin: 0; font-size: 16px; color: #5B6273">Boulangerie Marin · Mise aux normes du laboratoire</p>
+        </div>
+        <button type="button" style="height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid #D5D9E3; background: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 15px; color: #14161F; cursor: pointer">Voir le devis figé</button>
+      </div>
+
+      <section aria-labelledby="h-prog" style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <h2 id="h-prog" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Où en est la facturation</h2>
+        <div role="img" aria-label="1 200 euros facturés sur 4 000, soit 30 %" style="height: 14px; border-radius: 999px; background: #EEF0F5; overflow: hidden; display: flex">
+          <div style="width: 30%; background: #3448E0"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #5B6273; font-weight: 600">Total du devis</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px">4 000,00 €</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #5B6273; font-weight: 600">Déjà facturé en acomptes</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px; color: #2233B8">1 200,00 €</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #5B6273; font-weight: 600">Reste à facturer</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px">2 800,00 €</span></div>
+        </div>
+      </section>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+        <section aria-labelledby="h-docs" style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+          <h2 id="h-docs" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Factures liées</h2>
+
+          <article style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 16px; padding: 18px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: #EBEEFF; color: #2233B8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px" aria-hidden="true">30 %</div>
+            <div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-weight: 700">F-2026-026 · Facture d’acompte</span>
+              <span style="font-size: 14px; color: #5B6273">Émise le 28 oct. · échéance 12 nov.</span>
+            </div>
+            <span style="font-weight: 700; font-variant-numeric: tabular-nums">1 200,00 €</span>
+            <span style="padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #A12A1E; background: #FBE5E2">En retard</span>
+            <button type="button" style="height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #D5D9E3; background: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 14px; color: #14161F; cursor: pointer">Marquer payée</button>
+          </article>
+
+          <article style="background: #FFFFFF; border: 1.5px dashed #B7BDCC; border-radius: 16px; padding: 18px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: #EEF0F5; color: #4A5163; display: flex; align-items: center; justify-content: center" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg>
+            </div>
+            <div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-weight: 700">Facture de solde</span>
+              <span style="font-size: 14px; color: #5B6273">Reprend les 6 lignes du devis et déduit l’acompte F-2026-026.</span>
+            </div>
+            <span style="font-weight: 700; font-variant-numeric: tabular-nums">2 800,00 €</span>
+            <button type="button" style="height: 40px; padding: 0 16px; border-radius: 10px; border: none; background: #3448E0; color: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer">Préparer le solde</button>
+          </article>
+        </section>
+
+        <aside aria-labelledby="h-acompte" style="flex: 1 1 300px; min-width: 0; background: #EBEEFF; color: #14161F; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <h2 id="h-acompte" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Nouvel acompte</h2>
+          <div role="radiogroup" aria-label="Type de montant" style="display: flex; background: #D9DEFA; border-radius: 12px; padding: 4px">
+            <button type="button" role="radio" aria-checked="true" style="flex: 1; height: 40px; border-radius: 9px; border: none; background: #FFFFFF; color: #14161F; font-family: inherit; font-weight: 700; font-size: 14px">Pourcentage</button>
+            <button type="button" role="radio" aria-checked="false" style="flex: 1; height: 40px; border-radius: 9px; border: none; background: transparent; color: #3A4170; font-family: inherit; font-weight: 700; font-size: 14px">Montant</button>
+          </div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3A4170">Pourcentage du total
+            <input type="text" value="20 %" style="height: 46px; border-radius: 12px; border: 1px solid #C9D0F5; background: #FFFFFF; color: #14161F; padding: 0 14px; font-size: 16px; font-weight: 700">
+          </label>
+          <div style="display: flex; justify-content: space-between; font-size: 15px"><span style="color: #3A4170">Montant facturé</span><strong>800,00 €</strong></div>
+          <div style="display: flex; justify-content: space-between; font-size: 15px"><span style="color: #3A4170">Restera à facturer</span><strong>2 000,00 €</strong></div>
+          <button type="button" style="height: 48px; border-radius: 12px; border: none; background: #3448E0; color: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer">Créer la facture d’acompte</button>
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #4A5163">Elle est créée en brouillon. Le numéro est attribué à l’émission, ensuite elle ne se modifie plus.</p>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

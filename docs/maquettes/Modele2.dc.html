@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Modèle Discret – devis</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#3F5A4D}a:hover{color:#2C4237}
+</style>
+</helmet>
+<div style="width: 794px; height: 1123px; box-sizing: border-box; padding: 48px 52px; background: #FFFFFF; color: #26302B; font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column; gap: 22px">
+  <header style="display: flex; justify-content: space-between; align-items: center; gap: 24px">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <div aria-hidden="true" style="width: 48px; height: 48px; border-radius: 14px; background: #DCE7E1; color: #3F5A4D; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px">BE</div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-weight: 700; font-size: 21px">Benali Électricité</span>
+        <span style="font-size: 13px; color: #5E6B64">Électricité générale • Installation • Rénovation</span>
+      </div>
+    </div>
+    <div style="text-align: right; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-weight: 700; font-size: 30px; color: #3F5A4D">Devis</span>
+      <span style="font-size: 14px; color: #5E6B64">D-2026-016 · 31 octobre 2026</span>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; line-height: 1.55">
+    <div style="background: #F3F7F5; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 3px">
+      <span style="font-size: 12px; font-weight: 700; color: #3F5A4D">De</span>
+      <span style="font-weight: 700">Karim Benali EI</span>
+      <span>8 rue de la Fosse, 44000 Nantes</span>
+      <span>SIRET 912 345 678 00019</span>
+      <span>06 12 34 56 78 · contact@benali-elec.fr</span>
+    </div>
+    <div style="background: #F3F7F5; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 3px">
+      <span style="font-size: 12px; font-weight: 700; color: #3F5A4D">Pour</span>
+      <span style="font-weight: 700">SCI Les Tilleuls</span>
+      <span>3 place Royale, 44000 Nantes</span>
+      <span>SIREN 801 222 333</span>
+      <span>Intervention : 12 rue des Tilleuls, 44000 Nantes</span>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 700; color: #3F5A4D">Objet</span><span style="font-size: 17px; font-weight: 500">Rénovation électrique du rez-de-chaussée</span></div>
+
+  <table style="width: 100%; border-collapse: collapse">
+    <thead>
+      <tr style="font-size: 12px; color: #3F5A4D">
+        <th scope="col" style="text-align: left; padding: 10px 12px; font-weight: 700; background: #DCE7E1; border-radius: 10px 0 0 10px">Désignation</th>
+        <th scope="col" style="text-align: right; padding: 10px 8px; font-weight: 700; width: 48px; background: #DCE7E1">Qté</th>
+        <th scope="col" style="text-align: left; padding: 10px 8px; font-weight: 700; width: 70px; background: #DCE7E1">Unité</th>
+        <th scope="col" style="text-align: right; padding: 10px 8px; font-weight: 700; width: 92px; background: #DCE7E1">P.U. HT</th>
+        <th scope="col" style="text-align: right; padding: 10px 12px; font-weight: 700; width: 104px; background: #DCE7E1; border-radius: 0 10px 10px 0">Total HT</th>
+      </tr>
+    </thead>
+    <tbody style="font-variant-numeric: tabular-nums">
+      <tr><td style="padding: 11px 12px">Mise en sécurité et dépose de l’ancien tableau</td><td style="padding: 11px 8px; text-align: right">1</td><td style="padding: 11px 8px">forfait</td><td style="padding: 11px 8px; text-align: right">380,00 €</td><td style="padding: 11px 12px; text-align: right">380,00 €</td></tr>
+      <tr style="background: #F7FAF8"><td style="padding: 11px 12px">Fourniture et pose d’un tableau électrique 3 rangées</td><td style="padding: 11px 8px; text-align: right">1</td><td style="padding: 11px 8px">u</td><td style="padding: 11px 8px; text-align: right">1 150,00 €</td><td style="padding: 11px 12px; text-align: right">1 150,00 €</td></tr>
+      <tr><td style="padding: 11px 12px">Création de prises de courant 16 A</td><td style="padding: 11px 8px; text-align: right">8</td><td style="padding: 11px 8px">u</td><td style="padding: 11px 8px; text-align: right">65,00 €</td><td style="padding: 11px 12px; text-align: right">520,00 €</td></tr>
+      <tr style="background: #F7FAF8"><td style="padding: 11px 12px">Points lumineux avec interrupteur</td><td style="padding: 11px 8px; text-align: right">6</td><td style="padding: 11px 8px">u</td><td style="padding: 11px 8px; text-align: right">95,00 €</td><td style="padding: 11px 12px; text-align: right">570,00 €</td></tr>
+      <tr><td style="padding: 11px 12px">Raccordement, essais et vérifications</td><td style="padding: 11px 8px; text-align: right">1</td><td style="padding: 11px 8px">forfait</td><td style="padding: 11px 8px; text-align: right">300,00 €</td><td style="padding: 11px 12px; text-align: right">300,00 €</td></tr>
+    </tbody>
+  </table>
+
+  <div style="align-self: flex-end; width: 320px; background: #F3F7F5; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums">
+    <div style="display: flex; justify-content: space-between"><span>Total HT</span><span style="font-weight: 700">2 920,00 €</span></div>
+    <div style="font-size: 12px; color: #5E6B64">TVA non applicable, art. 293 B du CGI</div>
+    <div style="height: 1px; background: #DCE7E1"></div>
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-weight: 700; color: #3F5A4D">Total à payer</span><span style="font-weight: 700; font-size: 22px; color: #3F5A4D">2 920,00 €</span></div>
+  </div>
+
+  <div style="margin-top: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; line-height: 1.6; font-size: 13px">
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border: 1px solid #DCE7E1; border-radius: 14px">
+      <span style="font-size: 12px; font-weight: 700; color: #3F5A4D">Modalités</span>
+      <span>Validité du devis : 30 jours</span>
+      <span>Début prévisionnel : semaine du 23 novembre</span>
+      <span>Durée estimée : 4 jours</span>
+      <span>Paiement : acompte de 30 % à la signature, solde à réception de facture</span>
+      <span style="color: #5E6B64">Assurance décennale MAAF Pro n° DEC-4471209, France métropolitaine</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border: 1px solid #DCE7E1; border-radius: 14px">
+      <span style="font-size: 12px; font-weight: 700; color: #3F5A4D">Bon pour accord</span>
+      <span>Date :</span>
+      <span>Nom et signature du client :</span>
+      <div style="flex: 1; min-height: 64px; background: #F7FAF8; border-radius: 10px; margin-top: 6px"></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":794,"height":1123}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

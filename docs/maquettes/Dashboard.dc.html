@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tableau de bord</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F7FB}
+a{color:#4A5163}a:hover{color:#14161F}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Manrope, system-ui, sans-serif; color: #14161F; background: #F6F7FB">
+  <nav aria-label="Navigation principale" style="flex: 1 1 232px; max-width: 100%; background: #FFFFFF; color: #14161F; border-right: 1px solid #E3E6EE; padding: 28px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 9px; background: #3448E0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">D</span>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 17px">Devis &amp; Factures</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 600">
+      <a href="Dashboard.dc.html" aria-current="page" style="padding: 11px 12px; border-radius: 10px; text-decoration: none; background: #EBEEFF; color: #2233B8">Tableau de bord</a>
+      <a href="Devis.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Devis</a>
+      <a href="Facturation.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Factures</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Clients</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Lignes types</a>
+      <a href="Profil.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Profil entreprise</a>
+    </div>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid #E3E6EE">
+      <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; background: #F2B544; color: #14161F; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">KB</span>
+      <div style="display: flex; flex-direction: column; font-size: 13px"><span style="font-weight: 700">Karim Benali</span><span style="color: #5B6273">Benali Électricité</span></div>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 32px 64px; box-sizing: border-box">
+    <div style="max-width: 1080px; display: flex; flex-direction: column; gap: 32px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 15px; color: #5B6273">Mardi 3 novembre</span>
+          <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 38px; letter-spacing: -0.02em">Bonjour Karim</h1>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <a href="#" style="height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #D5D9E3; background: #FFFFFF; color: #14161F; display: inline-flex; align-items: center; font-weight: 700; font-size: 15px; text-decoration: none">Facture sans devis</a>
+          <a href="Devis.dc.html" style="height: 48px; padding: 0 20px; border-radius: 12px; background: #3448E0; color: #FFFFFF; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; text-decoration: none">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+            Nouveau devis
+          </a>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+        <div style="background: #EBEEFF; color: #14161F; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 14px; color: #2233B8; font-weight: 600">Reste à encaisser</span>
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 40px; letter-spacing: -0.02em">4 860,00 €</span>
+          <span style="font-size: 14px; color: #A12A1E; font-weight: 600">dont 1 200,00 € en retard</span>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 14px; color: #5B6273; font-weight: 600">Devis en attente de réponse</span>
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 40px; letter-spacing: -0.02em">3</span>
+          <span style="font-size: 14px; color: #5B6273">pour 7 450,00 € au total</span>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 14px; color: #5B6273; font-weight: 600">Encaissé en novembre</span>
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 40px; letter-spacing: -0.02em">3 120,00 €</span>
+          <span style="font-size: 14px; color: #5B6273">2 factures payées</span>
+        </div>
+      </div>
+
+      <section aria-labelledby="recents" style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+          <h2 id="recents" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px">Documents récents</h2>
+          <div role="group" aria-label="Filtrer" style="display: flex; gap: 6px; font-size: 14px; font-weight: 700">
+            <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #C9D0F5; background: #EBEEFF; color: #2233B8; font-family: inherit; font-weight: 700">Tous</button>
+            <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #D5D9E3; background: #FFFFFF; color: #14161F; font-family: inherit; font-weight: 700">Devis</button>
+            <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #D5D9E3; background: #FFFFFF; color: #14161F; font-family: inherit; font-weight: 700">Factures</button>
+          </div>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse; font-size: 15px; min-width: 720px">
+            <thead>
+              <tr style="text-align: left; color: #5B6273; font-size: 13px">
+                <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Numéro</th>
+                <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Client</th>
+                <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Date</th>
+                <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE; text-align: right">Montant</th>
+                <th scope="col" style="padding: 14px 20px; font-weight: 700; border-bottom: 1px solid #E3E6EE">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+                <tr>
+                  <td style="padding: 15px 20px; border-bottom: 1px solid #EEF0F5"><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700">{{r.num}}</span><span style="font-size: 13px; color: #5B6273">{{r.kind}}</span></div></td>
+                  <td style="padding: 15px 20px; border-bottom: 1px solid #EEF0F5">{{r.client}}</td>
+                  <td style="padding: 15px 20px; border-bottom: 1px solid #EEF0F5; color: #5B6273">{{r.date}}</td>
+                  <td style="padding: 15px 20px; border-bottom: 1px solid #EEF0F5; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums">{{r.amount}}</td>
+                  <td style="padding: 15px 20px; border-bottom: 1px solid #EEF0F5"><span style="{{r.badge}}">{{r.status}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tone = {
+      paid: ['#1F6B43', '#E2F3E9'],
+      late: ['#A12A1E', '#FBE5E2'],
+      wait: ['#8A5300', '#FFF1DC'],
+      ok: ['#2233B8', '#EBEEFF'],
+      draft: ['#4A5163', '#EEF0F5']
+    };
+    const raw = [
+      { num: 'F-2026-027', kind: 'Facture de solde', client: 'M. et Mme Lefèvre', date: '2 nov. 2026', amount: '2 940,00 €', status: 'À payer', t: 'wait' },
+      { num: 'D-2026-016', kind: 'Devis', client: 'SCI Les Tilleuls', date: '31 oct. 2026', amount: '4 380,00 €', status: 'Envoyé', t: 'draft' },
+      { num: 'F-2026-026', kind: 'Facture d’acompte', client: 'Boulangerie Marin', date: '28 oct. 2026', amount: '1 200,00 €', status: 'En retard', t: 'late' },
+      { num: 'D-2026-015', kind: 'Devis', client: 'Boulangerie Marin', date: '20 oct. 2026', amount: '4 000,00 €', status: 'Accepté', t: 'ok' },
+      { num: 'F-2026-025', kind: 'Facture', client: 'Mme Garnier', date: '15 oct. 2026', amount: '720,00 €', status: 'Payée', t: 'paid' },
+      { num: '—', kind: 'Devis (brouillon)', client: 'Cabinet Roux', date: '—', amount: '1 650,00 €', status: 'Brouillon', t: 'draft' }
+    ];
+    const rows = raw.map((r) => Object.assign({}, r, {
+      badge: 'display:inline-block;padding:5px 10px;border-radius:999px;font-size:13px;font-weight:700;color:' + tone[r.t][0] + ';background:' + tone[r.t][1]
+    }));
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>

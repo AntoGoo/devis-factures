@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Édition d’un devis</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F7FB}
+a{color:#4A5163}a:hover{color:#14161F}
+input,select,textarea{font-family:Manrope,system-ui,sans-serif;color:#14161F}
+input:focus,select:focus,textarea:focus{outline:2px solid #3448E0;outline-offset:1px}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Manrope, system-ui, sans-serif; color: #14161F; background: #F6F7FB">
+  <nav aria-label="Navigation principale" style="flex: 1 1 232px; max-width: 100%; background: #FFFFFF; color: #14161F; border-right: 1px solid #E3E6EE; padding: 28px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 9px; background: #3448E0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">D</span>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 17px">Devis &amp; Factures</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 600">
+      <a href="Dashboard.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Tableau de bord</a>
+      <a href="Devis.dc.html" aria-current="page" style="padding: 11px 12px; border-radius: 10px; text-decoration: none; background: #EBEEFF; color: #2233B8">Devis</a>
+      <a href="Facturation.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Factures</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Clients</a>
+      <a href="#" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Lignes types</a>
+      <a href="Profil.dc.html" style="padding: 11px 12px; border-radius: 10px; text-decoration: none">Profil entreprise</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 32px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+          <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -0.02em">Nouveau devis</h1>
+          <span style="padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #4A5163; background: #E6E9F0">Brouillon · numéro attribué à l’envoi</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button type="button" style="height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid #D5D9E3; background: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #14161F">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"></path><rect x="4" y="9" width="16" height="8" rx="2"></rect><path d="M7 14h10v7H7z"></path></svg>
+            Aperçu et PDF
+          </button>
+          <button type="button" style="height: 46px; padding: 0 18px; border-radius: 12px; border: none; background: #3448E0; color: #FFFFFF; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer">Marquer comme envoyé</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+        <div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+          <section aria-labelledby="h-client" style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px">
+            <h2 id="h-client" style="grid-column: 1 / -1; margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Client</h2>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Client
+              <select style="height: 46px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 12px; font-size: 15px; background: #FFFFFF">
+                <option>SCI Les Tilleuls (professionnel)</option>
+                <option>M. et Mme Lefèvre (particulier)</option>
+                <option>+ Nouveau client…</option>
+              </select>
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Adresse d’intervention <span style="font-weight: 500; color: #5B6273">si différente de l’adresse de facturation</span>
+              <input type="text" value="12 rue des Tilleuls, 44000 Nantes" style="height: 46px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 14px; font-size: 15px">
+            </label>
+            <label style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Objet
+              <input type="text" value="Rénovation électrique du rez-de-chaussée" style="height: 46px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 14px; font-size: 15px">
+            </label>
+          </section>
+
+          <section aria-labelledby="h-lignes" style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 16px">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+              <h2 id="h-lignes" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Prestations</h2>
+              <span style="font-size: 14px; color: #5B6273">{{countLabel}}</span>
+            </div>
+            <div style="overflow-x: auto">
+              <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px; min-width: 760px; font-size: 15px">
+                <thead>
+                  <tr style="text-align: left; font-size: 13px; color: #5B6273">
+                    <th scope="col" style="font-weight: 700; padding: 0 6px">Désignation</th>
+                    <th scope="col" style="font-weight: 700; padding: 0 6px; width: 84px">Qté</th>
+                    <th scope="col" style="font-weight: 700; padding: 0 6px; width: 116px">Unité</th>
+                    <th scope="col" style="font-weight: 700; padding: 0 6px; width: 130px">P.U. HT</th>
+                    <th scope="col" style="font-weight: 700; padding: 0 6px; width: 120px; text-align: right">Total HT</th>
+                    <th scope="col" style="width: 48px"><span style="position: absolute; left: -9999px">Supprimer</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{lines}}" as="l" hint-placeholder-count="5">
+                    <tr>
+                      <td style="padding: 0 6px"><input type="text" aria-label="Désignation" placeholder="Décrivez la prestation" value="{{l.d}}" onChange="{{l.setD}}" style="width: 100%; box-sizing: border-box; height: 44px; border-radius: 10px; border: 1px solid #D5D9E3; padding: 0 12px; font-size: 15px"></td>
+                      <td style="padding: 0 6px"><input type="number" aria-label="Quantité" min="0" value="{{l.q}}" onChange="{{l.setQ}}" style="width: 100%; box-sizing: border-box; height: 44px; border-radius: 10px; border: 1px solid #D5D9E3; padding: 0 10px; font-size: 15px"></td>
+                      <td style="padding: 0 6px"><select aria-label="Unité" value="{{l.u}}" onChange="{{l.setU}}" style="width: 100%; height: 44px; border-radius: 10px; border: 1px solid #D5D9E3; padding: 0 8px; font-size: 15px; background: #FFFFFF"><option value="u">u</option><option value="h">heure</option><option value="jour">jour</option><option value="forfait">forfait</option><option value="lot">lot</option><option value="m²">m²</option><option value="ml">ml</option></select></td>
+                      <td style="padding: 0 6px"><input type="number" aria-label="Prix unitaire HT en euros" min="0" step="0.01" value="{{l.p}}" onChange="{{l.setP}}" style="width: 100%; box-sizing: border-box; height: 44px; border-radius: 10px; border: 1px solid #D5D9E3; padding: 0 10px; font-size: 15px"></td>
+                      <td style="padding: 0 6px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap">{{l.total}}</td>
+                      <td style="padding: 0 0 0 4px"><button type="button" aria-label="Supprimer la ligne" onClick="{{l.remove}}" style="width: 44px; height: 44px; border-radius: 10px; border: none; background: transparent; color: #5B6273; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
+              <button type="button" onClick="{{addLine}}" style="height: 44px; padding: 0 16px; border-radius: 12px; border: 1.5px dashed #3448E0; background: #F3F5FF; color: #2233B8; font-family: inherit; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                Ajouter une ligne
+              </button>
+              <button type="button" style="height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #D5D9E3; background: #FFFFFF; color: #14161F; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer">Insérer une ligne type</button>
+            </div>
+          </section>
+
+          <section aria-labelledby="h-mod" style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px">
+            <h2 id="h-mod" style="grid-column: 1 / -1; margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Modalités</h2>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Validité
+              <input type="text" value="30 jours" style="height: 46px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 14px; font-size: 15px">
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Début prévisionnel
+              <input type="text" value="Semaine du 23 novembre" style="height: 46px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 14px; font-size: 15px">
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Durée estimée
+              <input type="text" value="4 jours" style="height: 46px; border-radius: 12px; border: 1px solid #D5D9E3; padding: 0 14px; font-size: 15px">
+            </label>
+            <label style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Conditions de paiement
+              <textarea rows="2" style="border-radius: 12px; border: 1px solid #D5D9E3; padding: 12px 14px; font-size: 15px; resize: vertical">Acompte de 30 % à la signature, solde à réception de facture.</textarea>
+            </label>
+          </section>
+        </div>
+
+        <aside aria-label="Récapitulatif" style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+          <div style="background: #EBEEFF; color: #14161F; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+            <div style="display: flex; justify-content: space-between; font-size: 15px; color: #3A4170"><span>Total HT</span><span style="font-variant-numeric: tabular-nums">{{totalHT}}</span></div>
+            <div style="font-size: 13px; line-height: 1.5; color: #4A5163">TVA non applicable, art. 293 B du CGI</div>
+            <div style="height: 1px; background: #C9D0F5"></div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <span style="font-size: 14px; color: #3A4170; font-weight: 600">Total à payer</span>
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 38px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{totalHT}}</span>
+            </div>
+            <div style="background: #FFFFFF; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #2233B8">Acompte prévu (30 %) : <strong>{{acompte}}</strong></div>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <span style="font-size: 14px; font-weight: 700">Modèle du document</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+              <span style="font-size: 15px">Intemporel</span>
+              <a href="Modele1.dc.html" style="font-size: 14px; font-weight: 700; color: #3448E0; text-decoration: none">Voir l’aperçu</a>
+            </div>
+          </div>
+          <ol aria-label="Étapes du devis" style="list-style: none; margin: 0; padding: 20px; background: #FFFFFF; border: 1px solid #E3E6EE; border-radius: 18px; display: flex; flex-direction: column; gap: 12px; font-size: 14px">
+            <li style="display: flex; gap: 10px; align-items: center; font-weight: 700"><span style="width: 22px; height: 22px; border-radius: 50%; background: #3448E0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12px">1</span>Brouillon</li>
+            <li style="display: flex; gap: 10px; align-items: center; color: #5B6273"><span style="width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #B7BDCC; display: flex; align-items: center; justify-content: center; font-size: 12px">2</span>Envoyé</li>
+            <li style="display: flex; gap: 10px; align-items: center; color: #5B6273"><span style="width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #B7BDCC; display: flex; align-items: center; justify-content: center; font-size: 12px">3</span>Accepté → acomptes et facture</li>
+          </ol>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.nextId = 6;
+    this.state = { lines: [
+      { id: 1, d: 'Mise en sécurité et dépose de l’ancien tableau', q: '1', u: 'forfait', p: '380' },
+      { id: 2, d: 'Fourniture et pose d’un tableau électrique 3 rangées', q: '1', u: 'u', p: '1150' },
+      { id: 3, d: 'Création de prises de courant 16 A', q: '8', u: 'u', p: '65' },
+      { id: 4, d: 'Points lumineux avec interrupteur', q: '6', u: 'u', p: '95' },
+      { id: 5, d: '', q: '1', u: 'u', p: '' }
+    ] };
+  }
+  fmt(n) {
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+  patch(id, key, value) {
+    this.setState({ lines: this.state.lines.map((l) => l.id === id ? Object.assign({}, l, { [key]: value }) : l) });
+  }
+  renderVals() {
+    let sum = 0;
+    const lines = this.state.lines.map((l) => {
+      const t = (parseFloat(String(l.q).replace(',', '.')) || 0) * (parseFloat(String(l.p).replace(',', '.')) || 0);
+      sum += t;
+      return Object.assign({}, l, {
+        total: this.fmt(t),
+        setD: (e) => this.patch(l.id, 'd', e.target.value),
+        setQ: (e) => this.patch(l.id, 'q', e.target.value),
+        setU: (e) => this.patch(l.id, 'u', e.target.value),
+        setP: (e) => this.patch(l.id, 'p', e.target.value),
+        remove: () => this.setState({ lines: this.state.lines.filter((x) => x.id !== l.id) })
+      });
+    });
+    const n = lines.length;
+    return {
+      lines,
+      totalHT: this.fmt(sum),
+      acompte: this.fmt(Math.floor(sum * 0.3 * 100) / 100),
+      countLabel: n + (n > 1 ? ' lignes' : ' ligne'),
+      addLine: () => { const id = this.nextId++; this.setState({ lines: this.state.lines.concat([{ id, d: '', q: '1', u: 'u', p: '' }]) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
