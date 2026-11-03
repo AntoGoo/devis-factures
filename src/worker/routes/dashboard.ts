@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { DashboardData, RecentDocument } from '../../shared/api-types';
 import { monthRange, todayInParis } from '../../shared/dates';
 import { INVOICE_DISPLAY, INVOICE_KIND_LABEL, QUOTE_STATUS, invoiceDisplay, type InvoiceKind, type InvoiceStatus, type QuoteStatus } from '../../shared/status';
-import { getProfile } from '../db/profiles';
+import { getProfileSummary } from '../db/profiles';
 import { validate } from '../errors';
 import type { AppEnv } from '../types';
 
@@ -58,7 +58,7 @@ export const dashboardRoutes = new Hono<AppEnv>().get(
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .slice(0, 10);
 
-    const profile = await getProfile(DB, userId);
+    const profile = await getProfileSummary(DB, userId);
     const o = outstanding!.results[0] as { total: number; late: number };
     const p = pending!.results[0] as { n: number; total: number };
     const k = collected!.results[0] as { n: number; total: number };

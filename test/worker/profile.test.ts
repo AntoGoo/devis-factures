@@ -1,4 +1,6 @@
+import { env } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
+import { getProfileSummary } from '../../src/worker/db/profiles';
 import { PROFILE, seedProfile } from './fixtures';
 import { call, createAllowedUser, json, testApp } from './helpers';
 
@@ -25,6 +27,19 @@ describe('profil', () => {
     expect(res.status).toBe(200);
     expect((await json(res)).profile).toMatchObject({ siret: '91234567800019', templateRef: 'modele-02@1', vatRegime: 'franchise' });
     expect(await json(await call(app, u, 'GET', '/api/me'))).toMatchObject({ onboarding: { profileComplete: true }, profileSummary: { ownerName: 'Karim Benali', tradeName: 'Benali Électricité' } });
+  });
+
+  it('fournit à /api/me et au tableau de bord un résumé léger du profil, sans le logo', async () => {
+    const u = await createAllowedUser('karim@example.test');
+    expect(await getProfileSummary(env.DB, u.id)).toBeNull();
+    await seedProfile(app, u);
+    await env.DB.prepare('UPDATE profiles SET logo_data_url = ? WHERE user_id = ?').bind('data:image/png;base64,iVBORw0KGgo=', u.id).run();
+    expect(await getProfileSummary(env.DB, u.id)).toEqual({
+      templateRef: 'modele-01@1', ownerName: 'Karim Benali', tradeName: 'Benali Électricité',
+      street: '8 rue de la Fosse', postalCode: '44000', city: 'Nantes', siret: '91234567800019',
+    });
+    expect(await json(await call(app, u, 'GET', '/api/me'))).toMatchObject({ onboarding: { templateRef: 'modele-01@1', profileComplete: true } });
+    expect((await json(await call(app, u, 'GET', '/api/dashboard'))).greetingName).toBe('Karim');
   });
 
   it('répond 400 avec les champs fautifs', async () => {

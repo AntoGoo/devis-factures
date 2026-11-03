@@ -36,6 +36,8 @@ export const ProfileInput = z
 export type ProfileInput = z.infer<typeof ProfileInput>;
 export type ProfileData = ProfileInput & { templateRef: string; vatRegime: 'franchise' };
 
-export function isProfileComplete(p: ProfileData): boolean {
+export type ProfileCompletenessFields = Pick<ProfileData, 'ownerName' | 'street' | 'postalCode' | 'city' | 'siret'>;
+
+export function isProfileComplete(p: ProfileCompletenessFields): boolean {
   return p.ownerName !== '' && p.street !== '' && p.postalCode !== '' && p.city !== '' && /^\d{14}$/.test(p.siret);
 }

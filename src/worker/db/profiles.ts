@@ -1,5 +1,5 @@
 import { DEFAULT_TEMPLATE_REF } from '../../templates/catalog';
-import { isProfileComplete, type ProfileData, type ProfileInput } from '../../shared/profile';
+import { isProfileComplete, type ProfileCompletenessFields, type ProfileData, type ProfileInput } from '../../shared/profile';
 import { HttpError } from '../errors';
 
 const FIELDS = [
@@ -22,6 +22,20 @@ function rowToProfile(r: Row): ProfileData {
 export async function getProfile(db: D1Database, userId: string): Promise<ProfileData | null> {
   const row = await db.prepare('SELECT * FROM profiles WHERE user_id = ?').bind(userId).first<Row>();
   return row ? rowToProfile(row) : null;
+}
+
+export type ProfileSummary = ProfileCompletenessFields & Pick<ProfileData, 'templateRef' | 'tradeName'>;
+
+/** Lecture légère pour /api/me et le tableau de bord : jamais le logo (jusqu'à plusieurs centaines de Ko). */
+export async function getProfileSummary(db: D1Database, userId: string): Promise<ProfileSummary | null> {
+  return db
+    .prepare(
+      `SELECT template_ref AS templateRef, owner_name AS ownerName, trade_name AS tradeName,
+         street, postal_code AS postalCode, city, siret
+       FROM profiles WHERE user_id = ?`,
+    )
+    .bind(userId)
+    .first<ProfileSummary>();
 }
 
 export async function requireCompleteProfile(db: D1Database, userId: string): Promise<ProfileData> {
