@@ -2,6 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { AppShell } from './layout/AppShell';
 import { AccessDeniedPage } from './pages/AccessDeniedPage';
+import { AdminPage } from './pages/AdminPage';
 import { LoginPage } from './pages/LoginPage';
 import { queryClient } from './query';
 import { RequireAuth } from './session/RequireAuth';
@@ -16,6 +17,7 @@ export function App() {
           <Route element={<RequireAuth />}>
             <Route element={<AppShell />}>
               <Route index element={<h1 className="page-title">Devis &amp; Factures</h1>} />
+              <Route path="admin" element={<AdminPage />} />
             </Route>
           </Route>
         </Routes>

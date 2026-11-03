@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { createAuth } from './auth';
 import { onError } from './errors';
 import { requireUser, sameOrigin } from './middleware';
+import { adminRoutes } from './routes/admin';
 import { meRoutes } from './routes/me';
 import type { AppDeps, AppEnv } from './types';
 
@@ -20,6 +21,7 @@ export function createApp(deps: AppDeps) {
   const api = new Hono<AppEnv>();
   api.use('*', sameOrigin, requireUser);
   api.route('/', meRoutes);
+  api.route('/admin', adminRoutes);
 
   app.route('/api', api);
   app.notFound((c) => c.json({ error: 'not_found', message: 'Adresse inconnue.' }, 404));
