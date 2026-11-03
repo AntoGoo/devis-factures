@@ -56,3 +56,29 @@ it('recharge le document à chaque ouverture et n’imprime que la version fraî
   expect(printedWithNumber).toEqual([false, true]);
   expect(screen.getAllByText('N° D-2026-016').length).toBeGreaterThan(0);
 });
+
+it('n’imprime automatiquement qu’une fois, même si le document est relu (retour sur l’onglet)', async () => {
+  const view = buildDocumentView({ kind: 'quote', number: 'D-2026-016', date: '2026-10-31', templateRef: 'modele-02@1', profile: PROFILE_DATA, client: CLIENT_BUSINESS_DATA, object: '', interventionAddress: null, lines: MOCKUP_LINES, quoteTerms: { validityDays: 30, plannedStart: '', estimatedDuration: '', paymentTerms: '', plannedDepositBp: null } });
+  // Réponse un peu lente, comme sur le réseau : la relecture passe par l’état « en cours ».
+  const fetchMock = vi.fn(async () => { await new Promise((resolve) => setTimeout(resolve, 30)); return Response.json({ view }); });
+  vi.stubGlobal('fetch', fetchMock);
+  const print = vi.fn();
+  vi.stubGlobal('print', print);
+  Object.defineProperty(document, 'fonts', { configurable: true, value: { ready: Promise.resolve() } });
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={['/imprimer/devis/q1?auto=1']}>
+        <Routes><Route path="/imprimer/:type/:id" element={<PrintPage />} /></Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  await waitFor(() => expect(print).toHaveBeenCalledTimes(1));
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+
+  // Retour sur l’onglet après la fenêtre d’impression : TanStack Query relit le document.
+  window.dispatchEvent(new Event('visibilitychange'));
+  document.dispatchEvent(new Event('visibilitychange'));
+  await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  expect(print).toHaveBeenCalledTimes(1);
+});

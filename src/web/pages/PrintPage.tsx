@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { DocumentView } from '../../shared/document';
 import { getTemplate } from '../../templates/registry';
@@ -29,10 +29,17 @@ export function PrintPage() {
     return () => { document.title = previous; };
   }, [view]);
 
+  // Impression automatique une seule fois par ouverture de la page : la relecture du document
+  // au retour sur l’onglet (après la fenêtre d’impression) ne doit pas la relancer.
+  const autoPrinted = useRef(false);
   useEffect(() => {
-    if (!view || !fresh || params.get('auto') !== '1') return;
+    if (!view || !fresh || autoPrinted.current || params.get('auto') !== '1') return;
     let cancelled = false;
-    void document.fonts.ready.then(() => { if (!cancelled) window.print(); });
+    void document.fonts.ready.then(() => {
+      if (cancelled || autoPrinted.current) return;
+      autoPrinted.current = true;
+      window.print();
+    });
     return () => { cancelled = true; };
   }, [view, fresh, params]);
 
