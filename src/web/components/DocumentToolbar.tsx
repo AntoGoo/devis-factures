@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { PRINT_HELP } from '../pages/PrintPage';
 
-export function DocumentToolbar({ printPath, beforeOpen }: { printPath: string; beforeOpen?: () => Promise<void> }) {
+/**
+ * Ouvre l’aperçu d’un document après avoir attendu `beforeOpen` (enregistrement en cours).
+ * Par défaut : bouton « Aperçu et PDF » qui lance l’impression ; `label` en fait un simple lien d’aperçu.
+ */
+export function DocumentToolbar({ printPath, beforeOpen, label, className = 'btn btn-secondary' }: {
+  printPath: string; beforeOpen?: () => Promise<void>; label?: string; className?: string;
+}) {
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -12,7 +18,7 @@ export function DocumentToolbar({ printPath, beforeOpen }: { printPath: string; 
     setError(null);
     try {
       await beforeOpen?.();
-      navigate(`${printPath}?auto=1`);
+      navigate(label ? printPath : `${printPath}?auto=1`);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur inattendue.');
     } finally {
@@ -22,9 +28,11 @@ export function DocumentToolbar({ printPath, beforeOpen }: { printPath: string; 
 
   return (
     <span className="actions" style={{ alignItems: 'center' }}>
-      <button type="button" className="btn btn-secondary" title={PRINT_HELP} disabled={pending} onClick={() => { void open(); }}>
+      <button type="button" className={className} title={label ? undefined : PRINT_HELP} disabled={pending} onClick={() => { void open(); }}>
+        {label ?? <>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V3h12v6" /><rect x="4" y="9" width="16" height="8" rx="2" /><path d="M7 14h10v7H7z" /></svg>
         Aperçu et PDF
+        </>}
       </button>
       {error && <span role="alert" className="field-hint">{`Enregistrement impossible : ${error}. L’aperçu n’a pas été ouvert.`}</span>}
     </span>

@@ -7,6 +7,7 @@ import { formatEuros, formatPercent } from '../../shared/money';
 import { INVOICE_DISPLAY, INVOICE_KIND_LABEL } from '../../shared/status';
 import { api } from '../api';
 import { DepositPanel } from '../billing/DepositPanel';
+import { DocumentToolbar } from '../components/DocumentToolbar';
 import { StatusBadge } from '../components/StatusBadge';
 import './QuoteBillingPage.css';
 
@@ -53,7 +54,7 @@ export function QuoteBillingPage() {
           </div>
           <p className="page-intro">{b.quote.clientName} · {b.quote.object}</p>
         </div>
-        <Link className="btn btn-secondary" to={`/imprimer/devis/${id}`}>Voir le devis figé</Link>
+        <DocumentToolbar printPath={`/imprimer/devis/${id}`} label="Voir le devis figé" />
       </div>
       {error && <p className="notice notice-error" role="alert">{error.message}</p>}
 

@@ -15,8 +15,10 @@ export function PrintPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const endpoint = type === 'factures' ? `/api/invoices/${id}` : `/api/quotes/${id}`;
-  const doc = useQuery({ queryKey: ['print', type, id], queryFn: () => api<{ view: DocumentView }>('GET', endpoint) });
+  // Toujours relire le document : l’aperçu suit souvent une émission ou une correction.
+  const doc = useQuery({ queryKey: ['print', type, id], queryFn: () => api<{ view: DocumentView }>('GET', endpoint), staleTime: 0, gcTime: 0 });
   const view = doc.data?.view;
+  const fresh = doc.isFetchedAfterMount && !doc.isFetching;
   const template = view ? getTemplate(view.templateRef) : null;
   useTemplateFonts(template?.fontsHref ?? '');
 
@@ -28,11 +30,11 @@ export function PrintPage() {
   }, [view]);
 
   useEffect(() => {
-    if (!view || params.get('auto') !== '1') return;
+    if (!view || !fresh || params.get('auto') !== '1') return;
     let cancelled = false;
     void document.fonts.ready.then(() => { if (!cancelled) window.print(); });
     return () => { cancelled = true; };
-  }, [view, params]);
+  }, [view, fresh, params]);
 
   return (
     <div className="print-page">

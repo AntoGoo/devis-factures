@@ -28,6 +28,8 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 .btn-danger { border: 1px solid var(--c-danger-border); background: var(--c-surface); color: var(--c-danger); height: 36px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 14px; }
 .btn-dashed { border: 1.5px dashed var(--c-primary); background: var(--c-primary-softer); color: var(--c-primary-strong); height: 44px; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.link-button { border: none; background: none; padding: 0; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--c-primary); cursor: pointer; text-align: left; text-decoration: underline; }
+.link-button:disabled { opacity: 0.5; cursor: wait; }
 
 .badge { display: inline-block; padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; }
 .tone-paid { color: var(--c-success); background: var(--c-success-soft); }

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes } from 'react-router';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 import { DocumentToolbar } from './DocumentToolbar';
 
@@ -12,12 +12,16 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-function renderToolbar(beforeOpen?: () => Promise<void>) {
+function Preview() {
+  return <p>Aperçu ouvert{useLocation().search}</p>;
+}
+
+function renderToolbar(beforeOpen?: () => Promise<void>, label?: string) {
   return render(
     <MemoryRouter initialEntries={['/devis/q1']}>
       <Routes>
-        <Route path="/devis/q1" element={<DocumentToolbar printPath="/imprimer/devis/q1" beforeOpen={beforeOpen} />} />
-        <Route path="/imprimer/devis/q1" element={<p>Aperçu ouvert</p>} />
+        <Route path="/devis/q1" element={<DocumentToolbar printPath="/imprimer/devis/q1" beforeOpen={beforeOpen} label={label} />} />
+        <Route path="/imprimer/devis/q1" element={<Preview />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -32,7 +36,19 @@ describe('DocumentToolbar', () => {
 
     await user.click(button);
     expect(button).toBeDisabled();
-    expect(screen.queryByText('Aperçu ouvert')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Aperçu ouvert/)).not.toBeInTheDocument();
+
+    d.resolve();
+    expect(await screen.findByText('Aperçu ouvert?auto=1')).toBeInTheDocument();
+  });
+
+  it('en lien d’aperçu (label), attend aussi beforeOpen puis ouvre l’aperçu sans impression automatique', async () => {
+    const d = deferred<void>();
+    renderToolbar(() => d.promise, 'Voir l’aperçu');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Voir l’aperçu' }));
+    expect(screen.queryByText(/Aperçu ouvert/)).not.toBeInTheDocument();
 
     d.resolve();
     expect(await screen.findByText('Aperçu ouvert')).toBeInTheDocument();
@@ -46,7 +62,7 @@ describe('DocumentToolbar', () => {
     await user.click(screen.getByRole('button', { name: /Aperçu et PDF/ }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Enregistrement impossible : Échec réseau. L’aperçu n’a pas été ouvert.');
-    expect(screen.queryByText('Aperçu ouvert')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Aperçu ouvert/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Aperçu et PDF/ })).not.toBeDisabled();
   });
 });

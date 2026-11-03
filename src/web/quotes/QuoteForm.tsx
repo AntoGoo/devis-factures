@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
-import { Link } from 'react-router';
 import type { QuoteResponse } from '../../shared/api-types';
 import type { ClientData } from '../../shared/client';
 import { depositAmountCents } from '../../shared/deposits';
@@ -8,6 +7,7 @@ import { formatEuros, formatPercent, parsePercent } from '../../shared/money';
 import type { QuoteDraftInput } from '../../shared/quote';
 import { api } from '../api';
 import { ClientFormDialog } from '../components/ClientFormDialog';
+import { DocumentToolbar } from '../components/DocumentToolbar';
 import { draftFromLine, draftsToLines, liveTotals, type DraftLine } from '../lines/lineDrafts';
 import { LinesEditor } from '../lines/LinesEditor';
 import { useAutosave } from '../lines/useAutosave';
@@ -108,7 +108,7 @@ export function QuoteForm({ initial, units, templateName, onSaved, children }: {
           <div className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <span style={{ fontSize: 14, fontWeight: 700 }}>Modèle du document</span>
             <span>{templateName}</span>
-            <Link to={`/imprimer/devis/${initial.quote.id}`} style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-primary)' }}>Voir l’aperçu</Link>
+            <DocumentToolbar printPath={`/imprimer/devis/${initial.quote.id}`} beforeOpen={autosave.flush} label="Voir l’aperçu" className="link-button" />
           </div>
         </aside>
       </div>
