@@ -5,9 +5,10 @@ import { DEFAULT_UNITS } from '../../shared/profile';
 import { QUOTE_STATUS } from '../../shared/status';
 import { getTemplate } from '../../templates/registry';
 import { api } from '../api';
+import { DocumentToolbar } from '../components/DocumentToolbar';
 import { StatusBadge } from '../components/StatusBadge';
-import { draftFromLine } from '../lines/lineDrafts';
-import { LinesEditor } from '../lines/LinesEditor';
+import { DocumentRenderer } from '../document/DocumentRenderer';
+import { useTemplateFonts } from '../document/useTemplateFonts';
 import { useProfile } from '../profile/useProfile';
 import { QuoteForm } from '../quotes/QuoteForm';
 import { quoteActions, type QuoteAction } from '../quotes/quoteActions';
@@ -21,6 +22,7 @@ export function QuoteEditorPage() {
   const quote = useQuery({ queryKey: ['quote', id], queryFn: () => api<QuoteResponse>('GET', `/api/quotes/${id}`) });
   const profile = useProfile().data?.profile;
   const units = profile?.units ?? DEFAULT_UNITS;
+  useTemplateFonts(quote.data ? getTemplate(quote.data.view.templateRef).fontsHref : '');
 
   const act = useMutation({
     mutationFn: async ({ action, flush }: { action: QuoteAction; flush?: () => Promise<void> }) => {
@@ -54,6 +56,7 @@ export function QuoteEditorPage() {
           {saveState && <span className="field-hint" role="status">{saveState}</span>}
         </div>
         <div className="actions" style={{ alignItems: 'center' }}>
+          <DocumentToolbar printPath={`/imprimer/devis/${q.id}`} beforeOpen={flush} />
           {actions.map((a) => {
             const labels: Record<QuoteAction, string> = { send: 'Marquer comme envoyé', accept: 'Marquer comme accepté', refuse: 'Marquer comme refusé', duplicate: 'Dupliquer', delete: 'Supprimer le brouillon' };
             const confirmText: Partial<Record<QuoteAction, string>> = { accept: 'Le contenu du devis sera figé. Continuer ?', refuse: 'Le devis sera figé comme refusé. Continuer ?', delete: 'Supprimer ce brouillon ?' };
@@ -93,7 +96,7 @@ export function QuoteEditorPage() {
         <>
           {header()}
           <p className="notice">Le contenu de ce devis est figé depuis son {q.status === 'accepted' ? 'acceptation' : 'refus'}.</p>
-          <LinesEditor drafts={view.lines.map(draftFromLine)} onChange={() => {}} units={units} readOnly />
+          <div className="doc-sheet"><DocumentRenderer view={view} template={getTemplate(view.templateRef)} /></div>
         </>
       )}
       {steps}

@@ -7,3 +7,32 @@
 .tpl-modele-02-v1-thumb .t-row { height: 6px; background: #F3F6F4; }
 .tpl-modele-02-v1-thumb .t-row--plain { background: #FFFFFF; border-bottom: 1px solid #EEF3F0; }
 .tpl-modele-02-v1-thumb .t-total { align-self: flex-end; width: 50%; height: 22px; background: #EEF3F0; border-radius: 6px; margin-top: auto; }
+
+.tpl-modele-02-v1 { font-family: 'DM Sans', sans-serif; color: #26302B; background: #FFFFFF; }
+.tpl-modele-02-v1 .doc-header { align-items: center; }
+.tpl-modele-02-v1 .doc-initials { display: flex; width: 48px; height: 48px; border-radius: 14px; background: #DCE7E1; color: #3F5A4D; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+.tpl-modele-02-v1 .doc-brand-text { gap: 2px; }
+.tpl-modele-02-v1 .doc-trade-name { font-weight: 700; font-size: 21px; }
+.tpl-modele-02-v1 .doc-activity { font-size: 13px; color: #5E6B64; }
+.tpl-modele-02-v1 .doc-heading { gap: 2px; }
+.tpl-modele-02-v1 .doc-title { font-weight: 700; font-size: 30px; color: #3F5A4D; }
+.tpl-modele-02-v1 .doc-meta { flex-direction: row; justify-content: flex-end; gap: 0; font-size: 14px; color: #5E6B64; }
+.tpl-modele-02-v1 .doc-meta .doc-date::before { content: ' · '; white-space: pre; }
+.tpl-modele-02-v1 .doc-rule { display: none; }
+.tpl-modele-02-v1 .doc-parties { gap: 16px; }
+.tpl-modele-02-v1 .doc-party { background: #F3F7F5; border-radius: 14px; padding: 16px 18px; }
+.tpl-modele-02-v1 .doc-label { font-size: 12px; font-weight: 700; color: #3F5A4D; }
+.tpl-modele-02-v1 .doc-object { display: flex; flex-direction: column; gap: 4px; }
+.tpl-modele-02-v1 .doc-object-text { font-size: 17px; font-weight: 500; }
+.tpl-modele-02-v1 .doc-lines th { font-size: 12px; font-weight: 700; color: #3F5A4D; background: #DCE7E1; padding: 10px 8px; }
+.tpl-modele-02-v1 .doc-lines th:first-child { border-radius: 10px 0 0 10px; }
+.tpl-modele-02-v1 .doc-lines th:last-child { border-radius: 0 10px 10px 0; }
+.tpl-modele-02-v1 .doc-lines tbody tr:nth-child(even) { background: #F7FAF8; }
+.tpl-modele-02-v1 .doc-totals { width: 320px; background: #F3F7F5; border-radius: 14px; padding: 16px 18px; }
+.tpl-modele-02-v1 .doc-vat, .tpl-modele-02-v1 .doc-reference, .tpl-modele-02-v1 .doc-insurance { color: #5E6B64; }
+.tpl-modele-02-v1 .doc-total-row span:last-child { font-weight: 700; }
+.tpl-modele-02-v1 .doc-total-due { align-items: baseline; border-top: 1px solid #DCE7E1; padding-top: 8px; font-weight: 700; color: #3F5A4D; }
+.tpl-modele-02-v1 .doc-total-due span:last-child { font-size: 22px; }
+.tpl-modele-02-v1 .doc-footer-blocks { gap: 16px; }
+.tpl-modele-02-v1 .doc-terms, .tpl-modele-02-v1 .doc-approval { padding: 14px 16px; border: 1px solid #DCE7E1; border-radius: 14px; }
+.tpl-modele-02-v1 .doc-signature { flex: 1; min-height: 64px; background: #F7FAF8; border-radius: 10px; }

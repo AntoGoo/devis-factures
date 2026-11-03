@@ -1,0 +1,48 @@
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
+import type { DocumentView } from '../../shared/document';
+import { getTemplate } from '../../templates/registry';
+import { api } from '../api';
+import { DocumentRenderer } from '../document/DocumentRenderer';
+import { printTitle } from '../document/printTitle';
+import { useTemplateFonts } from '../document/useTemplateFonts';
+
+export const PRINT_HELP = 'Dans la fenêtre d’impression, choisissez « Enregistrer au format PDF » et décochez « En-têtes et pieds de page ».';
+
+export function PrintPage() {
+  const { type, id } = useParams();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const endpoint = type === 'factures' ? `/api/invoices/${id}` : `/api/quotes/${id}`;
+  const doc = useQuery({ queryKey: ['print', type, id], queryFn: () => api<{ view: DocumentView }>('GET', endpoint) });
+  const view = doc.data?.view;
+  const template = view ? getTemplate(view.templateRef) : null;
+  useTemplateFonts(template?.fontsHref ?? '');
+
+  useEffect(() => {
+    if (!view) return;
+    const previous = document.title;
+    document.title = printTitle(view);
+    return () => { document.title = previous; };
+  }, [view]);
+
+  useEffect(() => {
+    if (!view || params.get('auto') !== '1') return;
+    let cancelled = false;
+    void document.fonts.ready.then(() => { if (!cancelled) window.print(); });
+    return () => { cancelled = true; };
+  }, [view, params]);
+
+  return (
+    <div className="print-page">
+      <div className="print-toolbar no-print">
+        <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>Retour</button>
+        <button type="button" className="btn btn-primary" onClick={() => window.print()}>Imprimer / PDF</button>
+        <p className="print-help">{PRINT_HELP}</p>
+      </div>
+      {doc.error && <p className="notice notice-error" role="alert">{doc.error.message}</p>}
+      {view && template && <div className="doc-sheet"><DocumentRenderer view={view} template={template} /></div>}
+    </div>
+  );
+}

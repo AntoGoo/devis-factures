@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router';
 import type { QuoteResponse } from '../../shared/api-types';
 import type { ClientData } from '../../shared/client';
 import { depositAmountCents } from '../../shared/deposits';
@@ -107,6 +108,7 @@ export function QuoteForm({ initial, units, templateName, onSaved, children }: {
           <div className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <span style={{ fontSize: 14, fontWeight: 700 }}>Modèle du document</span>
             <span>{templateName}</span>
+            <Link to={`/imprimer/devis/${initial.quote.id}`} style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-primary)' }}>Voir l’aperçu</Link>
           </div>
         </aside>
       </div>

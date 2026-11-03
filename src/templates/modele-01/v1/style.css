@@ -6,3 +6,27 @@
 .tpl-modele-01-v1-thumb .t-head { height: 10px; background: #ECEDEF; border-bottom: 1px solid #111111; margin-top: 6px; }
 .tpl-modele-01-v1-thumb .t-row { height: 6px; background: #E4E4E4; }
 .tpl-modele-01-v1-thumb .t-total { align-self: flex-end; width: 45%; height: 10px; border-top: 2px solid #111111; border-bottom: 2px solid #111111; margin-top: auto; }
+
+.tpl-modele-01-v1 { font-family: Manrope, sans-serif; color: #111111; background: #FFFFFF; }
+.tpl-modele-01-v1 .doc-brand-bar { display: block; width: 56px; height: 8px; background: #111111; }
+.tpl-modele-01-v1 .doc-trade-name { font-family: Archivo, sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -0.01em; text-transform: uppercase; }
+.tpl-modele-01-v1 .doc-activity { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #555555; }
+.tpl-modele-01-v1 .doc-title { font-family: Archivo, sans-serif; font-weight: 800; font-size: 46px; line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; }
+.tpl-modele-01-v1 .doc-number { font-weight: 700; }
+.tpl-modele-01-v1 .doc-date { color: #555555; }
+.tpl-modele-01-v1 .doc-rule { height: 2px; background: #111111; }
+.tpl-modele-01-v1 .doc-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #555555; }
+.tpl-modele-01-v1 .doc-object { background: #F2F2F2; padding: 12px 16px; display: flex; gap: 12px; }
+.tpl-modele-01-v1 .doc-object .doc-label { padding-top: 3px; }
+.tpl-modele-01-v1 .doc-object-text { font-weight: 600; }
+.tpl-modele-01-v1 .doc-lines thead tr { background: #F1F2F4; border-bottom: 1.5px solid #111111; }
+.tpl-modele-01-v1 .doc-lines th { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 10px 8px; }
+.tpl-modele-01-v1 .doc-lines tbody tr { border-bottom: 1px solid #DDDDDD; }
+.tpl-modele-01-v1 .doc-vat, .tpl-modele-01-v1 .doc-reference, .tpl-modele-01-v1 .doc-insurance { color: #555555; }
+.tpl-modele-01-v1 .doc-total-row span:last-child { font-weight: 700; }
+.tpl-modele-01-v1 .doc-total-due { align-items: center; border-top: 1.5px solid #111111; border-bottom: 1.5px solid #111111; padding: 12px 4px; font-family: Archivo, sans-serif; font-weight: 800; }
+.tpl-modele-01-v1 .doc-total-due span:first-child { letter-spacing: 0.06em; text-transform: uppercase; }
+.tpl-modele-01-v1 .doc-total-due span:last-child { font-size: 20px; }
+.tpl-modele-01-v1 .doc-terms, .tpl-modele-01-v1 .doc-approval { border-top: 2px solid #111111; padding-top: 10px; }
+.tpl-modele-01-v1 .doc-footer-blocks .doc-label { color: #111111; }
+.tpl-modele-01-v1 .doc-signature { border: 1px solid #BBBBBB; }

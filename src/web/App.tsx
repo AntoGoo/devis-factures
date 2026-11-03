@@ -6,6 +6,7 @@ import { AdminPage } from './pages/AdminPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { LinePresetsPage } from './pages/LinePresetsPage';
 import { LoginPage } from './pages/LoginPage';
+import { PrintPage } from './pages/PrintPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { QuoteEditorPage } from './pages/QuoteEditorPage';
 import { QuotesListPage } from './pages/QuotesListPage';
@@ -21,6 +22,7 @@ export function App() {
           <Route path="/connexion" element={<LoginPage />} />
           <Route path="/acces-refuse" element={<AccessDeniedPage />} />
           <Route element={<RequireAuth />}>
+            <Route path="/imprimer/:type/:id" element={<PrintPage />} />
             <Route path="/bienvenue/modele" element={<TemplatePickerPage mode="onboarding" />} />
             <Route path="/bienvenue/entreprise" element={<ProfilePage mode="onboarding" />} />
             <Route element={<AppShell />}>
