@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-pool-workers';
+import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-plugin';
 
 export default defineConfig(async () => {
   const migrations = await readD1Migrations(path.join(import.meta.dirname, 'migrations'));
@@ -8,11 +8,7 @@ export default defineConfig(async () => {
     plugins: [
       cloudflareTest({
         miniflare: {
-          // @cloudflare/vitest-pool-workers@0.23.0 pins its own Miniflare/workerd
-          // build, whose newest supported compatibility date is 2026-08-22 (older
-          // than the date wrangler.jsonc uses, 2026-10-01). Keep this one lower so
-          // the test runtime can start; see task-1-report.md.
-          compatibilityDate: '2026-08-22',
+          compatibilityDate: '2026-10-01',
           compatibilityFlags: ['nodejs_compat'],
           d1Databases: ['DB'],
           bindings: {
