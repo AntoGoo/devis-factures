@@ -1,0 +1,8 @@
+# En-têtes de sécurité des pages et fichiers statiques (assets Cloudflare).
+# Mêmes valeurs que SECURITY_HEADERS dans src/worker/security-headers.ts (réponses du Worker) : test/worker/security-headers.test.ts vérifie qu'ils concordent.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Strict-Transport-Security: max-age=15552000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY

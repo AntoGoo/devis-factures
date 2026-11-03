@@ -11,11 +11,13 @@ import { meRoutes } from './routes/me';
 import { presetRoutes } from './routes/presets';
 import { profileRoutes } from './routes/profile';
 import { quoteRoutes } from './routes/quotes';
+import { securityHeaders } from './security-headers';
 import type { AppDeps, AppEnv } from './types';
 
 export function createApp(deps: AppDeps) {
   const app = new Hono<AppEnv>();
   app.onError(onError);
+  app.use('*', securityHeaders);
   app.use('*', async (c, next) => {
     c.set('deps', deps);
     await next();
