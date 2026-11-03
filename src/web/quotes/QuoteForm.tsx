@@ -62,7 +62,7 @@ export function QuoteForm({ initial, units, templateName, onSaved, children }: {
   return (
     <>
       {children({ flush: autosave.flush, saveState: saveLabel, payloadValid: payload !== null })}
-      <div className="editor">
+      <div className="editor editor--lines">
         <div className="editor-main">
           <section className="card form-grid" aria-labelledby="h-client" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
             <h2 id="h-client" className="card-title span-all">Client</h2>

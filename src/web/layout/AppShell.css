@@ -20,6 +20,11 @@
 .editor { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
 .editor-main { flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 .editor-aside { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+/* Éditeur avec tableau de lignes : sous 760 px de colonne principale (fenêtre < 1380 px environ),
+   le récapitulatif passe sous le formulaire plutôt que de rogner le tableau. */
+.editor--lines > .editor-main { flex-basis: 760px; }
+.editor--lines > .editor-aside { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }  /* sous le formulaire : blocs côte à côte */
+.editor--lines > .editor-aside > * { flex: 1 1 280px; }
 .summary { background: var(--c-primary-soft); border-radius: var(--radius-xl); padding: 24px; display: flex; flex-direction: column; gap: 14px; }
 .summary-row { display: flex; justify-content: space-between; font-size: 15px; color: var(--c-text-ink); font-variant-numeric: tabular-nums; }
 .summary-vat { font-size: 13px; line-height: 1.5; color: var(--c-text-soft); }
