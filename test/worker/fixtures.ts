@@ -1,5 +1,6 @@
-import { call, createAllowedUser, testApp } from './helpers';
+import type { ClientData, ClientInput } from '../../src/shared/client';
 import type { SessionUser } from '../../src/worker/types';
+import { call, createAllowedUser, json, testApp } from './helpers';
 
 type App = ReturnType<typeof testApp>;
 
@@ -32,6 +33,21 @@ export async function seedProfile(app: App, user: SessionUser, overrides: Partia
   if (t.status !== 200) throw new Error(`template: ${t.status} ${await t.text()}`);
   const p = await call(app, user, 'PUT', '/api/profile', { ...PROFILE, ...overrides });
   if (p.status !== 200) throw new Error(`profile: ${p.status} ${await p.text()}`);
+}
+
+export const CLIENT_BUSINESS = {
+  type: 'business' as const, name: 'SCI Les Tilleuls', street: '3 place Royale', postalCode: '44000', city: 'Nantes',
+  country: 'FR', siren: '801 222 333', email: 'gestion@tilleuls.example', phone: '',
+};
+export const CLIENT_INDIVIDUAL = {
+  type: 'individual' as const, name: 'M. et Mme Lefèvre', street: '5 rue Kervégan', postalCode: '44000', city: 'Nantes',
+  country: 'FR', siren: '', email: '', phone: '06 00 00 00 00',
+};
+
+export async function seedClient(app: App, user: SessionUser, overrides: Partial<ClientInput> = {}): Promise<ClientData> {
+  const res = await call(app, user, 'POST', '/api/clients', { ...CLIENT_BUSINESS, ...overrides });
+  if (res.status !== 201) throw new Error(`client: ${res.status} ${await res.text()}`);
+  return json<ClientData>(res);
 }
 
 export async function twoUsers(app: App): Promise<{ a: SessionUser; b: SessionUser }> {

@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { AppShell } from './layout/AppShell';
 import { AccessDeniedPage } from './pages/AccessDeniedPage';
 import { AdminPage } from './pages/AdminPage';
+import { ClientsPage } from './pages/ClientsPage';
 import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { TemplatePickerPage } from './pages/TemplatePickerPage';
@@ -22,6 +23,7 @@ export function App() {
             <Route element={<AppShell />}>
               <Route index element={<h1 className="page-title">Devis &amp; Factures</h1>} />
               <Route path="admin" element={<AdminPage />} />
+              <Route path="clients" element={<ClientsPage />} />
               <Route path="profil" element={<ProfilePage mode="settings" />} />
               <Route path="profil/modele" element={<TemplatePickerPage mode="settings" />} />
             </Route>

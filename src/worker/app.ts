@@ -3,6 +3,7 @@ import { createAuth } from './auth';
 import { onError } from './errors';
 import { requireUser, sameOrigin } from './middleware';
 import { adminRoutes } from './routes/admin';
+import { clientRoutes } from './routes/clients';
 import { meRoutes } from './routes/me';
 import { profileRoutes } from './routes/profile';
 import type { AppDeps, AppEnv } from './types';
@@ -23,6 +24,7 @@ export function createApp(deps: AppDeps) {
   api.use('*', sameOrigin, requireUser);
   api.route('/', meRoutes);
   api.route('/', profileRoutes);
+  api.route('/clients', clientRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);

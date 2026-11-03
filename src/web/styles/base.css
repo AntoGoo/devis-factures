@@ -49,3 +49,8 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 
 .logo-slot { width: 76px; height: 76px; border-radius: 16px; border: 1.5px dashed var(--c-placeholder); background: var(--c-bg); display: flex; align-items: center; justify-content: center; color: var(--c-text-muted); font-size: 12px; font-weight: 700; overflow: hidden; }
 .logo-slot img { max-width: 100%; max-height: 100%; }
+
+.dialog-backdrop { position: fixed; inset: 0; background: rgba(20, 22, 31, 0.35); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+.dialog { background: var(--c-surface); border-radius: var(--radius-xl); padding: 24px; width: min(640px, 100%); max-height: 90vh; overflow: auto; display: flex; flex-direction: column; gap: 18px; }
+.dialog-head { display: flex; justify-content: space-between; align-items: center; }
+.dialog-close { border: none; background: none; font-size: 24px; cursor: pointer; color: var(--c-text-muted); }
