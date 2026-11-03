@@ -5,6 +5,7 @@ import type { DashboardData, InvoiceResponse, QuoteResponse } from '../../shared
 import { formatDateShort } from '../../shared/dates';
 import { formatEuros } from '../../shared/money';
 import { api } from '../api';
+import { draftLinkLabel, RowLink } from '../components/RowLink';
 import { StatusBadge } from '../components/StatusBadge';
 import { formatDashboardDate } from './dashboardDate';
 
@@ -71,7 +72,7 @@ export function DashboardPage() {
               {d?.recent.length === 0 && <tr><td colSpan={5} style={{ color: 'var(--c-text-muted)' }}>Aucun document pour l’instant. Commencez par un devis.</td></tr>}
               {d?.recent.map((r) => (
                 <tr key={`${r.type}-${r.id}`} className="row-link" onClick={() => navigate(r.type === 'quote' ? `/devis/${r.id}` : `/factures/${r.id}`)}>
-                  <td><div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><strong>{r.number ?? '—'}</strong><span className="field-hint" style={{ fontSize: 13 }}>{r.kindLabel}</span></div></td>
+                  <td><div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><strong><RowLink to={r.type === 'quote' ? `/devis/${r.id}` : `/factures/${r.id}`} label={r.number ? undefined : draftLinkLabel(r.kindLabel, r.clientName)}>{r.number ?? '—'}</RowLink></strong><span className="field-hint" style={{ fontSize: 13 }}>{r.kindLabel}</span></div></td>
                   <td>{r.clientName ?? '—'}</td>
                   <td style={{ color: 'var(--c-text-muted)' }}>{r.date ? formatDateShort(r.date) : '—'}</td>
                   <td className="num" style={{ fontWeight: 700 }}>{formatEuros(r.amountCents)}</td>

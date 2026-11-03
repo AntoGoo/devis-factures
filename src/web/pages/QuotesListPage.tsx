@@ -6,6 +6,7 @@ import { formatDateShort } from '../../shared/dates';
 import { formatEuros } from '../../shared/money';
 import { QUOTE_STATUS, type QuoteStatus } from '../../shared/status';
 import { api } from '../api';
+import { draftLinkLabel, RowLink } from '../components/RowLink';
 import { StatusBadge } from '../components/StatusBadge';
 
 const FILTERS: { key: QuoteStatus | 'all'; label: string }[] = [
@@ -43,7 +44,7 @@ export function QuotesListPage() {
             {list.data?.items.length === 0 && <tr><td colSpan={6} style={{ color: 'var(--c-text-muted)' }}>Aucun devis.</td></tr>}
             {list.data?.items.map((q) => (
               <tr key={q.id} className="row-link" onClick={() => navigate(`/devis/${q.id}`)}>
-                <td><strong>{q.number ?? '—'}</strong>{!q.number && <div className="field-hint" style={{ fontSize: 13 }}>Devis (brouillon)</div>}</td>
+                <td><strong><RowLink to={`/devis/${q.id}`} label={q.number ? undefined : draftLinkLabel('Devis (brouillon)', q.clientName)}>{q.number ?? '—'}</RowLink></strong>{!q.number && <div className="field-hint" style={{ fontSize: 13 }}>Devis (brouillon)</div>}</td>
                 <td>{q.clientName ?? '—'}</td>
                 <td>{q.object || '—'}</td>
                 <td style={{ color: 'var(--c-text-muted)' }}>{q.quoteDate ? formatDateShort(q.quoteDate) : '—'}</td>

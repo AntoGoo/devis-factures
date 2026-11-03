@@ -6,6 +6,7 @@ import { formatDateShort } from '../../shared/dates';
 import { formatEuros } from '../../shared/money';
 import { INVOICE_DISPLAY, INVOICE_KIND_LABEL, type InvoiceKind } from '../../shared/status';
 import { api } from '../api';
+import { draftLinkLabel, RowLink } from '../components/RowLink';
 import { StatusBadge } from '../components/StatusBadge';
 
 const FILTERS: { key: InvoiceKind | 'all'; label: string }[] = [
@@ -41,7 +42,7 @@ export function InvoicesListPage() {
             {list.data?.items.length === 0 && <tr><td colSpan={6} style={{ color: 'var(--c-text-muted)' }}>Aucune facture.</td></tr>}
             {list.data?.items.map((i) => (
               <tr key={i.id} className="row-link" onClick={() => navigate(`/factures/${i.id}`)}>
-                <td><strong>{i.number ?? '—'}</strong><div className="field-hint" style={{ fontSize: 13 }}>{INVOICE_KIND_LABEL[i.kind]}{i.status === 'draft' ? ' (brouillon)' : ''}</div></td>
+                <td><strong><RowLink to={`/factures/${i.id}`} label={i.number ? undefined : draftLinkLabel(`${INVOICE_KIND_LABEL[i.kind]} (brouillon)`, i.clientName)}>{i.number ?? '—'}</RowLink></strong><div className="field-hint" style={{ fontSize: 13 }}>{INVOICE_KIND_LABEL[i.kind]}{i.status === 'draft' ? ' (brouillon)' : ''}</div></td>
                 <td>{i.clientName ?? '—'}</td>
                 <td style={{ color: 'var(--c-text-muted)' }}>{i.issueDate ? formatDateShort(i.issueDate) : '—'}</td>
                 <td style={{ color: 'var(--c-text-muted)' }}>{i.dueDate ? formatDateShort(i.dueDate) : '—'}</td>

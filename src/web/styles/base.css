@@ -62,3 +62,5 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 .chip--on { border-color: var(--c-primary-line); background: var(--c-primary-soft); color: var(--c-primary-strong); }
 .row-link { cursor: pointer; }
 .row-link:hover td { background: var(--c-bg); }
+.row-link-anchor { color: inherit; text-decoration: none; }
+.row-link-anchor:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; border-radius: 4px; }
