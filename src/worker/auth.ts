@@ -5,7 +5,7 @@ import { NotInvitedError, accessHooks } from './access';
 import type { SessionUser } from './types';
 
 function asForbidden(err: unknown): never {
-  if (err instanceof NotInvitedError) throw new APIError('FORBIDDEN', { message: 'not_invited' });
+  if (err instanceof NotInvitedError) throw new APIError('FORBIDDEN', { code: 'not_invited', message: 'not_invited' });
   throw err;
 }
 
