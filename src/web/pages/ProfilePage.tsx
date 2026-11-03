@@ -127,7 +127,7 @@ export function ProfilePage({ mode }: { mode: 'onboarding' | 'settings' }) {
         {field('units', 'Unités proposées dans les lignes', { hint: 'séparées par des virgules', span: true })}
       </section>
 
-      <section className="card form-grid" aria-labelledby="h-num" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+      <section className="card form-grid" aria-labelledby="h-num">
         <h2 id="h-num" className="card-title span-all">Numérotation</h2>
         {numbering.data?.series.map((s) => {
           const key = s.series === 'D' ? 'prefixQuote' : s.series === 'F' ? 'prefixInvoice' : 'prefixCredit';
@@ -140,7 +140,7 @@ export function ProfilePage({ mode }: { mode: 'onboarding' | 'settings' }) {
               {field(key, 'Préfixe')}
               {s.startEditable && (
                 <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
-                  <label className="field" style={{ flex: 1 }}>Reprendre à partir du n°
+                  <label className="field" style={{ flex: 1, minWidth: 0 }}>Reprendre à partir du n°
                     <input className="input" type="number" min={1} value={starts[s.series] ?? ''} onChange={(e) => setStarts({ ...starts, [s.series]: e.target.value })} />
                   </label>
                   <button type="button" className="btn btn-secondary" disabled={!starts[s.series]}
