@@ -66,3 +66,24 @@ export type InvoiceListItem = {
 type Link = { id: string; number: string | null } | null;
 export type InvoiceLinks = { quote: Link; creditNote: Link; creditedInvoice: Link };
 export type InvoiceResponse = { invoice: InvoiceDto; view: DocumentView; links: InvoiceLinks };
+
+export type BillingSummary = {
+  quote: {
+    id: string;
+    number: string;
+    acceptedAt: string;
+    clientName: string;
+    object: string;
+    totalCents: number;
+    plannedDepositBp: number | null;
+    lineCount: number;
+  };
+  invoices: InvoiceListItem[];
+  invoicedDepositsCents: number;
+  issuedDepositsCents: number;
+  remainingToInvoiceCents: number;
+  activeFinal: { id: string; status: InvoiceStatus } | null;
+  draftDepositCount: number;
+  canCreateDeposit: boolean;
+  canPrepareFinal: boolean;
+};

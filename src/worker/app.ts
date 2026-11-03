@@ -3,6 +3,7 @@ import { createAuth } from './auth';
 import { onError } from './errors';
 import { requireUser, sameOrigin } from './middleware';
 import { adminRoutes } from './routes/admin';
+import { billingRoutes } from './routes/billing';
 import { clientRoutes } from './routes/clients';
 import { invoiceRoutes } from './routes/invoices';
 import { meRoutes } from './routes/me';
@@ -31,6 +32,7 @@ export function createApp(deps: AppDeps) {
   api.route('/presets', presetRoutes);
   api.route('/quotes', quoteRoutes);
   api.route('/', invoiceRoutes);
+  api.route('/', billingRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);

@@ -8,6 +8,7 @@ import { LinePresetsPage } from './pages/LinePresetsPage';
 import { LoginPage } from './pages/LoginPage';
 import { PrintPage } from './pages/PrintPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { QuoteBillingPage } from './pages/QuoteBillingPage';
 import { QuoteEditorPage } from './pages/QuoteEditorPage';
 import { QuotesListPage } from './pages/QuotesListPage';
 import { TemplatePickerPage } from './pages/TemplatePickerPage';
@@ -30,6 +31,7 @@ export function App() {
               <Route path="admin" element={<AdminPage />} />
               <Route path="devis" element={<QuotesListPage />} />
               <Route path="devis/:id" element={<QuoteEditorPage />} />
+              <Route path="devis/:id/facturation" element={<QuoteBillingPage />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="lignes-types" element={<LinePresetsPage />} />
               <Route path="profil" element={<ProfilePage mode="settings" />} />

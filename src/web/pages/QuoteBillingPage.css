@@ -1,0 +1,22 @@
+.progress { height: 14px; border-radius: 999px; background: var(--c-border-soft); overflow: hidden; display: flex; }
+.progress > div { background: var(--c-primary); }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.figures > div { display: flex; flex-direction: column; gap: 4px; }
+.figures span { font-size: 14px; color: var(--c-text-muted); font-weight: 600; }
+.figures strong { font-family: var(--font-display); font-size: 26px; }
+.figure-accent { color: var(--c-primary-strong); }
+.bill-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 18px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.bill-card--draft { border: 1.5px dashed var(--c-placeholder); }
+.bill-icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--c-primary-soft); color: var(--c-primary-strong); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+.bill-card--draft .bill-icon { background: var(--c-border-soft); color: var(--c-text-soft); }
+.bill-main { flex: 1 1 220px; display: flex; flex-direction: column; gap: 3px; }
+.bill-title { font-weight: 700; }
+.bill-sub { font-size: 14px; color: var(--c-text-muted); }
+.bill-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+.deposit-panel { background: var(--c-primary-soft); border-radius: var(--radius-xl); padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.segmented { display: flex; background: var(--c-primary-panel); border-radius: var(--radius-md); padding: 4px; }
+.segmented button { flex: 1; height: 40px; border-radius: 9px; border: none; background: transparent; color: var(--c-text-ink); font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+.segmented button[aria-checked='true'] { background: #FFFFFF; color: var(--c-text); }
+.deposit-row { display: flex; justify-content: space-between; font-size: 15px; }
+.deposit-row span { color: var(--c-text-ink); }
+.deposit-note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--c-text-soft); }

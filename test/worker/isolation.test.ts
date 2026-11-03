@@ -77,4 +77,11 @@ describe('cloisonnement par utilisateur', () => {
     expect((await call(app, b, 'POST', `/api/invoices/${created.invoice.id}/credit-note`)).status).toBe(404);
     expect((await json(await call(app, b, 'GET', '/api/numbering'))).series[2].next).toBe('A-2026-001');
   });
+
+  it('cache la facturation d’un devis d’un autre utilisateur', async () => {
+    const { a, b } = await twoUsers(app);
+    const client = await seedClient(app, a);
+    const q = await seedAcceptedQuote(app, a, client.id);
+    expect((await call(app, b, 'GET', `/api/quotes/${q.quote.id}/billing`)).status).toBe(404);
+  });
 });

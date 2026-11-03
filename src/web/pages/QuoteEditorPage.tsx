@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import type { QuoteResponse } from '../../shared/api-types';
 import { DEFAULT_UNITS } from '../../shared/profile';
 import { QUOTE_STATUS } from '../../shared/status';
@@ -57,6 +57,7 @@ export function QuoteEditorPage() {
         </div>
         <div className="actions" style={{ alignItems: 'center' }}>
           <DocumentToolbar printPath={`/imprimer/devis/${q.id}`} beforeOpen={flush} />
+          {q.status === 'accepted' && <Link className="btn btn-primary" to={`/devis/${q.id}/facturation`}>Facturer</Link>}
           {actions.map((a) => {
             const labels: Record<QuoteAction, string> = { send: 'Marquer comme envoyé', accept: 'Marquer comme accepté', refuse: 'Marquer comme refusé', duplicate: 'Dupliquer', delete: 'Supprimer le brouillon' };
             const confirmText: Partial<Record<QuoteAction, string>> = { accept: 'Le contenu du devis sera figé. Continuer ?', refuse: 'Le devis sera figé comme refusé. Continuer ?', delete: 'Supprimer ce brouillon ?' };
