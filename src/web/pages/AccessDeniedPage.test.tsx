@@ -1,8 +1,13 @@
 // @vitest-environment jsdom
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+const { signOut } = vi.hoisted(() => ({ signOut: vi.fn(async () => ({ data: { success: true }, error: null })) }));
+vi.mock('../auth-client', () => ({ authClient: { signOut } }));
+
 import { AccessDeniedPage } from './AccessDeniedPage';
 
 function renderAt(status: number, body: unknown, path = '/acces-refuse') {
@@ -20,12 +25,34 @@ function renderAt(status: number, body: unknown, path = '/acces-refuse') {
   );
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); signOut.mockClear(); });
 
 describe('AccessDeniedPage', () => {
   it('affiche le message d’accès refusé sans paramètre error', async () => {
     renderAt(403, { error: 'not_invited', message: '' });
     expect(await screen.findByRole('heading', { name: 'Accès sur invitation' })).toBeInTheDocument();
+  });
+
+  it('propose « Accueil » à la place de « Revenir à la connexion » sur un refus d’invitation, avec le logo', async () => {
+    renderAt(403, { error: 'not_invited', message: '' });
+    await screen.findByRole('heading', { name: 'Accès sur invitation' });
+    expect(screen.getByRole('link', { name: 'Accueil' })).toHaveAttribute('href', '/');
+    expect(screen.queryByRole('link', { name: 'Revenir à la connexion' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Devis & Factures — accueil' })).toHaveAttribute('href', '/');
+  });
+
+  it('« Accueil » ferme la session refusée avant de revenir à l’accueil', async () => {
+    renderAt(403, { error: 'not_invited', message: '' });
+    await userEvent.click(await screen.findByRole('link', { name: 'Accueil' }));
+    expect(signOut).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText('Contenu protégé')).toBeInTheDocument();
+  });
+
+  it.each(['invalid_code', 'access_denied'])('propose « Réessayer » et « Accueil » pour ?error=%s, avec le logo', async (error) => {
+    renderAt(403, { error: 'not_invited', message: '' }, `/acces-refuse?error=${error}`);
+    expect(await screen.findByRole('link', { name: 'Réessayer' })).toHaveAttribute('href', '/connexion');
+    expect(screen.getByRole('link', { name: 'Accueil' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Devis & Factures — accueil' })).toHaveAttribute('href', '/');
   });
 
   it('affiche le message d’accès refusé pour ?error=not_invited', async () => {

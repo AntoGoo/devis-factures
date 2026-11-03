@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Brand } from './Brand';
 
 export function OnboardingLayout({ step, children }: { step: 1 | 2; children: ReactNode }) {
   const pill = (n: 1 | 2, label: string) => (
@@ -8,7 +9,7 @@ export function OnboardingLayout({ step, children }: { step: 1 | 2; children: Re
     <main className="onboarding">
       <div className="onboarding-inner">
         <header className="onboarding-head">
-          <div className="shell-brand"><span className="brand-mark" aria-hidden="true">D</span><span>Devis &amp; Factures</span></div>
+          <Brand className="shell-brand" />
           <ol aria-label="Étapes" className="steps">{pill(1, 'Modèle')}{pill(2, 'Votre entreprise')}</ol>
         </header>
         {children}

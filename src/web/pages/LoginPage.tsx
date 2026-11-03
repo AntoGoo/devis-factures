@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router';
 import { authClient } from '../auth-client';
+import { Brand } from '../layout/Brand';
 import { useMe } from '../session/useMe';
 import './LoginPage.css';
 
@@ -26,7 +27,7 @@ export function LoginPage() {
   return (
     <main className="login">
       <section className="login-hero">
-        <div className="brand"><span className="brand-mark" aria-hidden="true">D</span><span className="brand-name">Devis &amp; Factures</span></div>
+        <Brand className="brand" nameClassName="brand-name" />
         <div className="login-pitch">
           <h1>Du devis signé à la facture payée, sans ressaisir une ligne.</h1>
           <p>Vos coordonnées sont saisies une fois. Chaque devis accepté devient acompte, puis facture de solde, prête à imprimer.</p>

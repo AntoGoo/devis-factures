@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router';
 import { authClient } from '../auth-client';
 import { queryClient } from '../query';
 import { useMe } from '../session/useMe';
+import { Brand } from './Brand';
 import './AppShell.css';
 
 const LINKS = [
@@ -29,7 +30,7 @@ export function AppShell() {
   return (
     <div className="shell">
       <nav aria-label="Navigation principale" className="shell-nav">
-        <div className="shell-brand"><span className="brand-mark" aria-hidden="true">D</span><span>Devis &amp; Factures</span></div>
+        <Brand className="shell-brand" />
         <div className="shell-links">
           {LINKS.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.end} className="shell-link">{l.label}</NavLink>
