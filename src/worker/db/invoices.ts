@@ -51,7 +51,7 @@ export async function listInvoices(db: D1Database, userId: string, f: { kind?: I
     `SELECT i.id, i.kind, i.status, i.number, c.name AS client_name, i.issue_date, i.due_date, i.amount_due_cents, i.paid_at, i.deposit_bp, i.quote_id
      FROM invoices i LEFT JOIN clients c ON c.id = i.client_id AND c.user_id = i.user_id
      WHERE i.user_id = ?1 AND (?2 IS NULL OR i.kind = ?2) AND (?3 IS NULL OR i.quote_id = ?3)
-     ORDER BY COALESCE(i.issue_date, i.created_at) DESC, i.number DESC LIMIT 200`,
+     ORDER BY COALESCE(i.issue_date, i.created_at) DESC, i.created_at DESC, i.number DESC LIMIT 200`,
   ).bind(userId, f.kind ?? null, f.quoteId ?? null).all<ListRow>();
   return results.map((r) => ({
     id: r.id, kind: r.kind, status: r.status, number: r.number, clientName: r.client_name, issueDate: r.issue_date,

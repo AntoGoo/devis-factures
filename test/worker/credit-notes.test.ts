@@ -43,6 +43,13 @@ describe('paiement', () => {
 });
 
 describe('avoirs', () => {
+  it('liste l’avoir émis le même jour avant la facture qu’il annule (le plus récent d’abord)', async () => {
+    const { u, id } = await issuedStandalone();
+    await call(app, u, 'POST', `/api/invoices/${id}/credit-note`);
+    const list = await json(await call(app, u, 'GET', '/api/invoices'));
+    expect(list.items.map((i: { number: string }) => i.number)).toEqual(['A-2026-001', 'F-2026-001']);
+  });
+
   it('annule entièrement une facture : numéro A, montant négatif, référence à la facture', async () => {
     const { u, id } = await issuedStandalone();
     const res = await call(app, u, 'POST', `/api/invoices/${id}/credit-note`);
