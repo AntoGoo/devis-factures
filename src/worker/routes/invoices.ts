@@ -46,6 +46,25 @@ async function insertDraft(c: AppContext, v: { kind: InvoiceRow['kind']; quoteId
   return id;
 }
 
+/**
+ * Condition d'émission (alias d) : le brouillon est encore la version lue (aucun enregistrement entre-temps) ;
+ * pour un solde, les acomptes déduits (`deductedCount` émis, aucun en brouillon) n'ont pas changé ;
+ * pour un acompte, aucun solde n'a été émis.
+ */
+export function issueGuard(inv: InvoiceRow, deductedCount: number | null): { sql: string; params: (string | number | null)[] } {
+  const sql = ['AND d.updated_at = ?'];
+  const params: (string | number | null)[] = [inv.updated_at];
+  if (inv.kind === 'final' && deductedCount !== null) {
+    sql.push(`AND NOT EXISTS (SELECT 1 FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'deposit' AND x.status = 'draft')
+              AND (SELECT COUNT(*) FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'deposit' AND x.status = 'issued') = ?`);
+    params.push(deductedCount);
+  }
+  if (inv.kind === 'deposit') {
+    sql.push(`AND NOT EXISTS (SELECT 1 FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'final' AND x.status = 'issued')`);
+  }
+  return { sql: sql.join(' '), params };
+}
+
 export const invoiceRoutes = new Hono<AppEnv>()
   .post('/quotes/:id/deposits', validate('json', DepositInputSchema), async (c) => {
     const { DB } = c.env;
@@ -177,24 +196,16 @@ export const invoiceRoutes = new Hono<AppEnv>()
 
     const quote = inv.quote_id ? await getQuoteRow(DB, userId, inv.quote_id) : null;
     let deducted: Awaited<ReturnType<typeof listIssuedDeposits>> = [];
-    let guard: { sql: string; params: (string | number | null)[] } | undefined;
+    let deductedCount: number | null = null;
     if (inv.kind === 'final' && quote) {
       if ((await quoteBillingState(DB, userId, quote.id)).draftDepositCount > 0) {
         throw new HttpError(409, 'pending_deposit_draft', 'Émettez ou supprimez d’abord la facture d’acompte en brouillon.');
       }
       deducted = await listIssuedDeposits(DB, userId, quote.id);
+      deductedCount = deducted.length;
       if (computeBalance(computeTotals(lines).totalHtCents, deducted).remainingCents < 0) {
         throw new HttpError(409, 'negative_remaining', 'Le total du solde est inférieur aux acomptes déjà facturés. Ajustez les lignes.');
       }
-      // Rien n'a changé dans les acomptes entre la lecture et l'émission.
-      guard = {
-        sql: `AND NOT EXISTS (SELECT 1 FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'deposit' AND x.status = 'draft')
-              AND (SELECT COUNT(*) FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'deposit' AND x.status = 'issued') = ?`,
-        params: [deducted.length],
-      };
-    }
-    if (inv.kind === 'deposit') {
-      guard = { sql: `AND NOT EXISTS (SELECT 1 FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'final' AND x.status = 'issued')`, params: [] };
     }
 
     const view = buildDocumentView({
@@ -211,9 +222,9 @@ export const invoiceRoutes = new Hono<AppEnv>()
         total_ht_cents: view.totals.totalHtCents, amount_due_cents: view.totals.totalDueCents, updated_at: nowIso(c),
       },
       snapshotJson: JSON.stringify(view),
-      guard,
+      guard: issueGuard(inv, deductedCount),
     });
-    if (!result.issued) throw new HttpError(409, 'not_draft', 'Cette facture a changé entre-temps (déjà émise, ou acomptes modifiés). Rechargez la page.');
+    if (!result.issued) throw new HttpError(409, 'not_draft', 'La facture a été modifiée entre-temps. Rechargez la page.');
     return respondInvoice(c, inv.id);
   })
 

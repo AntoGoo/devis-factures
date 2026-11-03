@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { CLIENT_BUSINESS, PROFILE, createDeposit, seedAcceptedQuote, seedClient, seedProfile } from './fixtures';
+import { env } from 'cloudflare:test';
+import { requireInvoiceRow } from '../../src/worker/db/invoices';
+import { runIssue } from '../../src/worker/numbering';
+import { issueGuard } from '../../src/worker/routes/invoices';
 import { call, createAllowedUser, json, testApp } from './helpers';
 
 const app = testApp();
@@ -84,6 +88,19 @@ describe('émission', () => {
       });
     }
     expect((await json(await call(app, u, 'GET', '/api/numbering'))).series[1].next).toBe('F-2026-001');
+  });
+
+  it('n’émet pas une version du brouillon dépassée (garde sur updated_at)', async () => {
+    const { u, client } = await ready();
+    const id = await standalone(app, u, client.id);
+    const read = await requireInvoiceRow(env.DB, u.id, id);
+    // Un enregistrement automatique arrive entre la lecture et l'émission.
+    await env.DB.prepare('UPDATE invoices SET lines_json = ?, updated_at = ? WHERE id = ?').bind('[]', '2026-11-03T10:00:05.000Z', id).run();
+    const target = { table: 'invoices' as const, docId: id, userId: u.id, series: 'F' as const, year: 2026, prefix: 'F', set: { status: 'issued' } };
+    expect((await runIssue(env.DB, { ...target, guard: issueGuard(read, null) })).issued).toBe(false);
+    expect((await json(await call(app, u, 'GET', '/api/numbering'))).series[1].next).toBe('F-2026-001');
+    const fresh = await requireInvoiceRow(env.DB, u.id, id);
+    expect(await runIssue(env.DB, { ...target, guard: issueGuard(fresh, null) })).toEqual({ issued: true, number: 'F-2026-001' });
   });
 });
 

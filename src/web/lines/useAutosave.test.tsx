@@ -53,4 +53,24 @@ describe('useAutosave', () => {
     unmount();
     expect(save).not.toHaveBeenCalled();
   });
+
+  it('attend l’enregistrement en cours avant d’envoyer la version la plus récente (deux flush rapprochés)', async () => {
+    const pending: { v: { a: number }; resolve: () => void }[] = [];
+    const save = vi.fn((v: { a: number }) => new Promise<void>((resolve) => { pending.push({ v, resolve }); }));
+    const { rerender, result } = renderHook(({ v }) => useAutosave(v, save, { enabled: true }), { initialProps: { v: { a: 1 } } });
+    rerender({ v: { a: 2 } });
+    let first!: Promise<void>;
+    let second!: Promise<void>;
+    act(() => { first = result.current.flush(); });
+    rerender({ v: { a: 3 } });
+    act(() => { second = result.current.flush(); });
+    await act(async () => { await Promise.resolve(); });
+    // Le second envoi ne part pas tant que le premier n'a pas répondu.
+    expect(save.mock.calls.map(([v]) => v)).toEqual([{ a: 2 }]);
+    await act(async () => { pending[0]!.resolve(); await first; });
+    await act(async () => { await Promise.resolve(); });
+    expect(save.mock.calls.map(([v]) => v)).toEqual([{ a: 2 }, { a: 3 }]);
+    await act(async () => { pending[1]!.resolve(); await second; });
+    expect(result.current.state).toBe('saved');
+  });
 });
