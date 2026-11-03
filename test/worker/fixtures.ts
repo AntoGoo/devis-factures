@@ -1,4 +1,4 @@
-import type { QuoteResponse } from '../../src/shared/api-types';
+import type { InvoiceResponse, QuoteResponse } from '../../src/shared/api-types';
 import type { ClientData, ClientInput } from '../../src/shared/client';
 import type { Line } from '../../src/shared/lines';
 import { MOCKUP_LINES } from '../../src/shared/test-fixtures';
@@ -81,6 +81,15 @@ export async function seedQuote(
   if (opts.status === 'accepted') res = await call(app, user, 'POST', `/api/quotes/${id}/accept`);
   if (res.status !== 200) throw new Error(`quote: ${res.status} ${await res.text()}`);
   return json<QuoteResponse>(res);
+}
+
+export const seedAcceptedQuote = (app: App, user: SessionUser, clientId: string, lines?: Line[]) =>
+  seedQuote(app, user, { clientId, lines, status: 'accepted' });
+
+export async function createDeposit(app: App, user: SessionUser, quoteId: string, body: unknown): Promise<InvoiceResponse> {
+  const res = await call(app, user, 'POST', `/api/quotes/${quoteId}/deposits`, body);
+  if (res.status !== 201) throw new Error(`deposit: ${res.status} ${await res.text()}`);
+  return json<InvoiceResponse>(res);
 }
 
 export async function twoUsers(app: App): Promise<{ a: SessionUser; b: SessionUser }> {

@@ -4,6 +4,7 @@ import { onError } from './errors';
 import { requireUser, sameOrigin } from './middleware';
 import { adminRoutes } from './routes/admin';
 import { clientRoutes } from './routes/clients';
+import { invoiceRoutes } from './routes/invoices';
 import { meRoutes } from './routes/me';
 import { presetRoutes } from './routes/presets';
 import { profileRoutes } from './routes/profile';
@@ -29,6 +30,7 @@ export function createApp(deps: AppDeps) {
   api.route('/clients', clientRoutes);
   api.route('/presets', presetRoutes);
   api.route('/quotes', quoteRoutes);
+  api.route('/', invoiceRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);

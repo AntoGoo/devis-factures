@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CLIENT_BUSINESS, quoteBody, seedClient, seedQuote, twoUsers } from './fixtures';
+import { CLIENT_BUSINESS, createDeposit, quoteBody, seedAcceptedQuote, seedClient, seedQuote, twoUsers } from './fixtures';
 import { call, json, testApp } from './helpers';
 
 const app = testApp();
@@ -47,5 +47,22 @@ describe('cloisonnement par utilisateur', () => {
     expect(after.quote.clientId).toBeNull();
     expect(after.view.client).toBeNull();
     expect((await call(app, b, 'POST', '/api/quotes', { clientId: clientOfA.id })).status).toBe(404);
+  });
+
+  it('protège les devis et factures d’un autre utilisateur côté facturation (vigilance n° 5)', async () => {
+    const { a, b } = await twoUsers(app);
+    const clientOfA = await seedClient(app, a);
+    const q = await seedAcceptedQuote(app, a, clientOfA.id);
+    expect((await call(app, b, 'POST', `/api/quotes/${q.quote.id}/deposits`, { mode: 'percent', basisPoints: 3000 })).status).toBe(404);
+    expect((await call(app, b, 'POST', `/api/quotes/${q.quote.id}/final`)).status).toBe(404);
+    const d = await createDeposit(app, a, q.quote.id, { mode: 'percent', basisPoints: 3000 });
+    expect((await call(app, b, 'GET', `/api/invoices/${d.invoice.id}`)).status).toBe(404);
+    expect((await call(app, b, 'PUT', `/api/invoices/${d.invoice.id}`, { serviceDate: null, dueDate: null, notes: '' })).status).toBe(404);
+    expect((await call(app, b, 'DELETE', `/api/invoices/${d.invoice.id}`)).status).toBe(404);
+    expect((await json(await call(app, b, 'GET', '/api/invoices'))).items).toEqual([]);
+    expect((await call(app, b, 'POST', '/api/invoices/standalone', { clientId: clientOfA.id })).status).toBe(404);
+    const own = await json(await call(app, b, 'POST', '/api/invoices/standalone', {}));
+    expect((await call(app, b, 'PUT', `/api/invoices/${own.invoice.id}`, { clientId: clientOfA.id, serviceDate: null, dueDate: null, notes: '' })).status).toBe(404);
+    expect((await json(await call(app, b, 'GET', `/api/invoices/${own.invoice.id}`))).view.client).toBeNull();
   });
 });
