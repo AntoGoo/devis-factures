@@ -68,10 +68,10 @@ export const invoiceRoutes = new Hono<AppEnv>()
     const res = await DB.prepare(
       `INSERT INTO invoices (id, user_id, kind, quote_id, client_id, status, object, intervention_address, lines_json, deposit_bp, total_ht_cents, amount_due_cents, created_at, updated_at)
        SELECT ?, ?, 'deposit', ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?
-       WHERE (SELECT COALESCE(SUM(amount_due_cents), 0) FROM invoices WHERE quote_id = ? AND kind = 'deposit' AND status != 'cancelled') + ? <= ?
-         AND NOT EXISTS (SELECT 1 FROM invoices WHERE quote_id = ? AND kind = 'final' AND status != 'cancelled')`,
+       WHERE (SELECT COALESCE(SUM(amount_due_cents), 0) FROM invoices WHERE user_id = ? AND quote_id = ? AND kind = 'deposit' AND status != 'cancelled') + ? <= ?
+         AND NOT EXISTS (SELECT 1 FROM invoices WHERE user_id = ? AND quote_id = ? AND kind = 'final' AND status != 'cancelled')`,
     ).bind(id, userId, quote.id, quote.client_id, snap.object, snap.interventionAddress, JSON.stringify([line]),
-      input.mode === 'percent' ? input.basisPoints : null, amount, amount, nowIso(c), nowIso(c), quote.id, amount, totalCents, quote.id).run();
+      input.mode === 'percent' ? input.basisPoints : null, amount, amount, nowIso(c), nowIso(c), userId, quote.id, amount, totalCents, userId, quote.id).run();
     if (res.meta.changes === 0) throw new HttpError(409, 'deposit_exceeds_total', 'La facturation de ce devis a changé entre-temps. Rechargez la page.');
     return respondInvoice(c, id, 201);
   })
@@ -85,13 +85,20 @@ export const invoiceRoutes = new Hono<AppEnv>()
     if (state.draftDepositCount > 0) throw new HttpError(409, 'pending_deposit_draft', 'Émettez ou supprimez d’abord la facture d’acompte en brouillon.');
     const snap = parseSnapshot(quote.snapshot_json);
     const lines = snap.lines.map((l) => ({ ...l, id: crypto.randomUUID() }));
+    const total = computeTotals(lines).totalHtCents;
+    const id = crypto.randomUUID();
     try {
-      const id = await insertDraft(c, {
-        kind: 'final', quoteId: quote.id, clientId: quote.client_id, object: snap.object, interventionAddress: snap.interventionAddress,
-        lines, amountDueCents: computeTotals(lines).totalHtCents - state.issuedDepositsCents,
-      });
+      // L'absence d'acompte en brouillon est revérifiée dans l'INSERT lui-même (deux onglets, double clic).
+      const res = await DB.prepare(
+        `INSERT INTO invoices (id, user_id, kind, quote_id, client_id, status, object, intervention_address, lines_json, total_ht_cents, amount_due_cents, created_at, updated_at)
+         SELECT ?, ?, 'final', ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?
+         WHERE NOT EXISTS (SELECT 1 FROM invoices WHERE user_id = ? AND quote_id = ? AND kind = 'deposit' AND status = 'draft')`,
+      ).bind(id, userId, quote.id, quote.client_id, snap.object, snap.interventionAddress, JSON.stringify(lines),
+        total, total - state.issuedDepositsCents, nowIso(c), nowIso(c), userId, quote.id).run();
+      if (res.meta.changes === 0) throw new HttpError(409, 'pending_deposit_draft', 'Émettez ou supprimez d’abord la facture d’acompte en brouillon.');
       return respondInvoice(c, id, 201);
     } catch (e) {
+      if (e instanceof HttpError) throw e;
       if (String(e).includes('UNIQUE')) throw new HttpError(409, 'final_exists', 'Une facture de solde existe déjà pour ce devis.');
       throw e;
     }

@@ -85,6 +85,20 @@ describe('facture de solde et facture sans devis', () => {
     expect(await json(await call(app, u, 'POST', `/api/quotes/${q.quote.id}/final`))).toMatchObject({ error: 'pending_deposit_draft' });
   });
 
+  it('refuse le solde si un acompte brouillon est inséré directement en base (protection au niveau SQL, pas seulement la lecture préalable)', async () => {
+    const { u, client } = await ready();
+    const q = await seedAcceptedQuote(app, u, client.id);
+    const now = new Date().toISOString();
+    await env.DB.prepare(
+      "INSERT INTO invoices (id, user_id, kind, quote_id, client_id, status, created_at, updated_at) VALUES (?, ?, 'deposit', ?, ?, 'draft', ?, ?)",
+    ).bind(crypto.randomUUID(), u.id, q.quote.id, client.id, now, now).run();
+    const res = await call(app, u, 'POST', `/api/quotes/${q.quote.id}/final`);
+    expect(res.status).toBe(409);
+    expect(await json(res)).toMatchObject({ error: 'pending_deposit_draft' });
+    const { results } = await env.DB.prepare("SELECT id FROM invoices WHERE quote_id = ? AND kind = 'final'").bind(q.quote.id).all();
+    expect(results).toHaveLength(0);
+  });
+
   it('crée une facture sans devis avec 5 lignes vides, modifiable', async () => {
     const { u, client } = await ready();
     const created = await json(await call(app, u, 'POST', '/api/invoices/standalone', {}));
