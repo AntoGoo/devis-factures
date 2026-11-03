@@ -21,6 +21,16 @@ async function respond(c: AppContext, id: string, status: 200 | 201 = 200) {
 const nowIso = (c: AppContext) => c.var.deps.now().toISOString();
 const notSent = () => new HttpError(409, 'not_sent', 'Seul un devis envoyé peut être accepté ou refusé.');
 
+/** Un devis envoyé reste modifiable : l’envoi et l’acceptation exigent tous deux un client et des lignes complètes. */
+function assertQuoteComplete(row: QuoteRow, action: 'envoyer' | 'accepter'): void {
+  if (!row.client_id) throw new HttpError(409, 'client_missing', `Choisissez un client avant d’${action} le devis.`);
+  const problems = lineProblems(JSON.parse(row.lines_json) as Line[]);
+  if (problems.filledCount === 0) throw new HttpError(409, 'no_lines', 'Ajoutez au moins une ligne remplie.');
+  if (problems.missingDesignation.length > 0) {
+    throw new HttpError(409, 'missing_designation', `Chaque ligne chiffrée doit avoir une désignation (ligne ${problems.missingDesignation.join(', ')}).`);
+  }
+}
+
 async function insertQuote(
   c: AppContext,
   values: Omit<QuoteRow, 'id' | 'user_id' | 'number' | 'status' | 'quote_date' | 'sent_at' | 'accepted_at' | 'refused_at' | 'snapshot_json' | 'created_at' | 'updated_at'>,
@@ -85,12 +95,7 @@ export const quoteRoutes = new Hono<AppEnv>()
     const row = await requireQuoteRow(DB, userId, c.req.param('id'));
     if (row.status !== 'draft') throw new HttpError(409, 'not_draft', 'Ce devis a déjà été envoyé.');
     const profile = await requireCompleteProfile(DB, userId);
-    if (!row.client_id) throw new HttpError(409, 'client_missing', 'Choisissez un client avant d’envoyer le devis.');
-    const problems = lineProblems(JSON.parse(row.lines_json) as Line[]);
-    if (problems.filledCount === 0) throw new HttpError(409, 'no_lines', 'Ajoutez au moins une ligne remplie.');
-    if (problems.missingDesignation.length > 0) {
-      throw new HttpError(409, 'missing_designation', `Chaque ligne chiffrée doit avoir une désignation (ligne ${problems.missingDesignation.join(', ')}).`);
-    }
+    assertQuoteComplete(row, 'envoyer');
     const today = todayInParis(c.var.deps.now());
     const result = await runIssue(DB, {
       table: 'quotes', docId: row.id, userId, series: 'D', year: yearOf(today), prefix: profile.prefixQuote,
@@ -105,6 +110,7 @@ export const quoteRoutes = new Hono<AppEnv>()
     const userId = c.var.user.id;
     const row = await requireQuoteRow(DB, userId, c.req.param('id'));
     if (row.status !== 'sent') throw notSent();
+    assertQuoteComplete(row, 'accepter');
     const view = await quoteView(DB, userId, row);
     const res = await DB.prepare(
       "UPDATE quotes SET status = 'accepted', accepted_at = ?, snapshot_json = ?, updated_at = ? WHERE id = ? AND user_id = ? AND status = 'sent'",

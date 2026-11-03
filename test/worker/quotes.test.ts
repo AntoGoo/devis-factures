@@ -114,6 +114,26 @@ describe('acceptation, refus, duplication', () => {
     expect((await call(app, u, 'PUT', `/api/quotes/${sent.quote.id}`, quoteBody(client.id))).status).toBe(409);
   });
 
+  it('revérifie client et lignes à l’acceptation d’un devis envoyé puis modifié', async () => {
+    const { u, client } = await ready();
+    const sent = await seedQuote(app, u, { clientId: client.id, status: 'sent' });
+    const id = sent.quote.id;
+    const accept = async () => {
+      const res = await call(app, u, 'POST', `/api/quotes/${id}/accept`);
+      return { status: res.status, body: await json(res) };
+    };
+    await call(app, u, 'PUT', `/api/quotes/${id}`, quoteBody(null));
+    expect(await accept()).toMatchObject({ status: 409, body: { error: 'client_missing' } });
+    await call(app, u, 'PUT', `/api/quotes/${id}`, quoteBody(client.id, []));
+    expect(await accept()).toMatchObject({ status: 409, body: { error: 'no_lines' } });
+    await call(app, u, 'PUT', `/api/quotes/${id}`, quoteBody(client.id, [{ id: 'x', designation: ' ', quantityMilli: 1000, unit: 'u', unitPriceCents: 500, vatRate: null }]));
+    expect(await accept()).toMatchObject({ status: 409, body: { error: 'missing_designation' } });
+    const { quote } = await json(await call(app, u, 'GET', `/api/quotes/${id}`));
+    expect(quote.status).toBe('sent');
+    await call(app, u, 'PUT', `/api/quotes/${id}`, quoteBody(client.id));
+    expect(await accept()).toMatchObject({ status: 200, body: { quote: { status: 'accepted' } } });
+  });
+
   it('duplique en un nouveau brouillon sans numéro', async () => {
     const { u, client } = await ready();
     const q = await seedQuote(app, u, { clientId: client.id, status: 'accepted' });
