@@ -1,0 +1,8 @@
+.tpl-modele-01-v1-thumb .t-bar { height: 8px; width: 60%; background: #111111; }
+.tpl-modele-01-v1-thumb .t-title { font-family: Archivo, sans-serif; font-weight: 800; font-size: 26px; color: #111111; line-height: 1; }
+.tpl-modele-01-v1-thumb .t-rule { height: 1px; background: #111111; }
+.tpl-modele-01-v1-thumb .t-parties { display: flex; gap: 8px; }
+.tpl-modele-01-v1-thumb .t-parties div { flex: 1; height: 26px; background: #F1F1F1; }
+.tpl-modele-01-v1-thumb .t-head { height: 10px; background: #ECEDEF; border-bottom: 1px solid #111111; margin-top: 6px; }
+.tpl-modele-01-v1-thumb .t-row { height: 6px; background: #E4E4E4; }
+.tpl-modele-01-v1-thumb .t-total { align-self: flex-end; width: 45%; height: 10px; border-top: 2px solid #111111; border-bottom: 2px solid #111111; margin-top: auto; }

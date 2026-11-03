@@ -1,0 +1,9 @@
+.tpl-modele-02-v1-thumb .t-top { display: flex; justify-content: space-between; align-items: center; }
+.tpl-modele-02-v1-thumb .t-bar { height: 8px; width: 45%; background: #4F6B5E; border-radius: 4px; }
+.tpl-modele-02-v1-thumb .t-title { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #4F6B5E; }
+.tpl-modele-02-v1-thumb .t-parties { display: flex; gap: 8px; margin-top: 6px; }
+.tpl-modele-02-v1-thumb .t-parties div { flex: 1; height: 30px; background: #EEF3F0; border-radius: 6px; }
+.tpl-modele-02-v1-thumb .t-head { height: 10px; background: #DCE7E1; border-radius: 4px; margin-top: 6px; }
+.tpl-modele-02-v1-thumb .t-row { height: 6px; background: #F3F6F4; }
+.tpl-modele-02-v1-thumb .t-row--plain { background: #FFFFFF; border-bottom: 1px solid #EEF3F0; }
+.tpl-modele-02-v1-thumb .t-total { align-self: flex-end; width: 50%; height: 22px; background: #EEF3F0; border-radius: 6px; margin-top: auto; }
