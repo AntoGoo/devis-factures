@@ -4,6 +4,7 @@ import { AppShell } from './layout/AppShell';
 import { AccessDeniedPage } from './pages/AccessDeniedPage';
 import { AdminPage } from './pages/AdminPage';
 import { ClientsPage } from './pages/ClientsPage';
+import { DashboardPage } from './pages/DashboardPage';
 import { InvoicePage } from './pages/InvoicePage';
 import { InvoicesListPage } from './pages/InvoicesListPage';
 import { LinePresetsPage } from './pages/LinePresetsPage';
@@ -29,7 +30,7 @@ export function App() {
             <Route path="/bienvenue/modele" element={<TemplatePickerPage mode="onboarding" />} />
             <Route path="/bienvenue/entreprise" element={<ProfilePage mode="onboarding" />} />
             <Route element={<AppShell />}>
-              <Route index element={<h1 className="page-title">Devis &amp; Factures</h1>} />
+              <Route index element={<DashboardPage />} />
               <Route path="admin" element={<AdminPage />} />
               <Route path="devis" element={<QuotesListPage />} />
               <Route path="devis/:id" element={<QuoteEditorPage />} />
