@@ -5,6 +5,7 @@ import { requireUser, sameOrigin } from './middleware';
 import { adminRoutes } from './routes/admin';
 import { billingRoutes } from './routes/billing';
 import { clientRoutes } from './routes/clients';
+import { dashboardRoutes } from './routes/dashboard';
 import { invoiceRoutes } from './routes/invoices';
 import { meRoutes } from './routes/me';
 import { presetRoutes } from './routes/presets';
@@ -33,6 +34,7 @@ export function createApp(deps: AppDeps) {
   api.route('/quotes', quoteRoutes);
   api.route('/', invoiceRoutes);
   api.route('/', billingRoutes);
+  api.route('/', dashboardRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);

@@ -2,7 +2,7 @@ import type { DocumentView } from './document';
 import type { Line } from './lines';
 import type { Series } from './numbering';
 import type { QuoteDraftInput } from './quote';
-import type { InvoiceDisplay, InvoiceKind, InvoiceStatus, QuoteStatus } from './status';
+import type { InvoiceDisplay, InvoiceKind, InvoiceStatus, QuoteStatus, Tone } from './status';
 
 export type MeResponse = {
   user: { id: string; email: string; name: string };
@@ -86,4 +86,25 @@ export type BillingSummary = {
   draftDepositCount: number;
   canCreateDeposit: boolean;
   canPrepareFinal: boolean;
+};
+
+export type RecentDocument = {
+  type: 'quote' | 'invoice';
+  id: string;
+  number: string | null;
+  kindLabel: string;
+  clientName: string | null;
+  date: string | null;
+  amountCents: number;
+  status: { label: string; tone: Tone };
+  updatedAt: string;
+};
+
+export type DashboardData = {
+  today: string;
+  greetingName: string;
+  outstanding: { totalCents: number; lateCents: number };
+  pendingQuotes: { count: number; totalCents: number };
+  collectedThisMonth: { totalCents: number; count: number; monthLabel: string };
+  recent: RecentDocument[];
 };

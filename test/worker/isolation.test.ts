@@ -84,4 +84,12 @@ describe('cloisonnement par utilisateur', () => {
     const q = await seedAcceptedQuote(app, a, client.id);
     expect((await call(app, b, 'GET', `/api/quotes/${q.quote.id}/billing`)).status).toBe(404);
   });
+
+  it('n’agrège que les documents de l’utilisateur connecté', async () => {
+    const { a, b } = await twoUsers(app);
+    const client = await seedClient(app, a);
+    await seedQuote(app, a, { clientId: client.id, status: 'sent' });
+    const d = await json(await call(app, b, 'GET', '/api/dashboard'));
+    expect(d).toMatchObject({ outstanding: { totalCents: 0, lateCents: 0 }, pendingQuotes: { count: 0, totalCents: 0 }, collectedThisMonth: { totalCents: 0, count: 0 }, recent: [] });
+  });
 });
