@@ -46,8 +46,20 @@ export function createAuth(env: Env) {
   });
 }
 
+// Une instance par isolat : `env` est le même objet d'une requête à l'autre, inutile de tout reconstruire.
+const instances = new WeakMap<Env, ReturnType<typeof createAuth>>();
+
+export function getAuth(env: Env): ReturnType<typeof createAuth> {
+  let auth = instances.get(env);
+  if (!auth) {
+    auth = createAuth(env);
+    instances.set(env, auth);
+  }
+  return auth;
+}
+
 export async function betterAuthSessionUser(req: Request, env: Env): Promise<SessionUser | null> {
-  const result = await createAuth(env).api.getSession({ headers: req.headers });
+  const result = await getAuth(env).api.getSession({ headers: req.headers });
   if (!result) return null;
   return { id: result.user.id, email: result.user.email, name: result.user.name };
 }

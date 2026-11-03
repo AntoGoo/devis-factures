@@ -2,7 +2,7 @@ import { env } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
 import { APIError } from 'better-auth/api';
 import { NotInvitedError, accessHooks } from '../../src/worker/access';
-import { createAuth } from '../../src/worker/auth';
+import { createAuth, getAuth } from '../../src/worker/auth';
 import { allow, createAllowedUser, createUser } from './helpers';
 
 const hooks = () => accessHooks(env, () => new Date('2026-11-03T08:00:00Z'));
@@ -67,5 +67,12 @@ describe('databaseHooks branchés par createAuth', () => {
     const user = await createAllowedUser('lea2@example.test');
     const before = dbHooks().session!.create!.before!;
     await expect(before({ userId: user.id } as any)).resolves.toBeUndefined();
+  });
+});
+
+describe('getAuth', () => {
+  it('réutilise la même instance Better Auth pour un même env (une par isolat)', () => {
+    expect(getAuth(env)).toBe(getAuth(env));
+    expect(getAuth({ ...env })).not.toBe(getAuth(env));
   });
 });
