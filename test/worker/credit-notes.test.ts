@@ -23,6 +23,17 @@ describe('paiement', () => {
     expect((await json(await call(app, u, 'PUT', `/api/invoices/${id}/payment`, { paidAt: null }))).invoice.display).toBe('to_pay');
   });
 
+  it('refuse une date de paiement dans le futur (heure de Paris)', async () => {
+    const { u, id } = await issuedStandalone();
+    const res = await call(app, u, 'PUT', `/api/invoices/${id}/payment`, { paidAt: '2026-11-04' });
+    expect(res.status).toBe(409);
+    expect(await json(res)).toEqual({ error: 'paid_in_future', message: 'La date de paiement ne peut pas être dans le futur.' });
+    expect((await json(await call(app, u, 'GET', `/api/invoices/${id}`))).invoice.paidAt).toBeNull();
+    // 3 novembre 23 h 30 UTC = 4 novembre à Paris : le 4 est aujourd'hui.
+    const lateEvening = testApp(new Date('2026-11-03T23:30:00Z'));
+    expect((await call(lateEvening, u, 'PUT', `/api/invoices/${id}/payment`, { paidAt: '2026-11-04' })).status).toBe(200);
+  });
+
   it('refuse un paiement sur un brouillon ou antérieur à l’émission', async () => {
     const { u, id } = await issuedStandalone();
     expect(await json(await call(app, u, 'PUT', `/api/invoices/${id}/payment`, { paidAt: '2026-10-01' }))).toMatchObject({ error: 'paid_before_issue' });

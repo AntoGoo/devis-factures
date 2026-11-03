@@ -137,7 +137,7 @@ export function InvoicePage() {
         </>
       )}
       <Dialog open={dialog === 'pay'} title="Marquer la facture payée" onClose={() => setDialog(null)}>
-        <label className="field">Date du paiement<input className="input" type="date" value={paidAt} onChange={(e) => setPaidAt(e.target.value)} /></label>
+        <label className="field">Date du paiement<input className="input" type="date" max={todayInParis(new Date())} value={paidAt} onChange={(e) => setPaidAt(e.target.value)} /></label>
         {dialogError}
         <div className="actions" style={{ justifyContent: 'flex-end' }}>
           <button type="button" className="btn btn-secondary" onClick={() => setDialog(null)}>Annuler</button>

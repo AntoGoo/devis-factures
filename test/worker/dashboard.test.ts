@@ -25,7 +25,10 @@ describe('GET /api/dashboard', () => {
     const september = testApp(new Date('2026-09-01T10:00:00Z'));
     // Payée ce mois, puis annulée par avoir : doit rester comptée dans « encaissé ce mois » et disparaître du « reste à encaisser ».
     const paidThenCredited = await issuedInvoice(september, u, client.id, 45000);
-    await call(september, u, 'PUT', `/api/invoices/${paidThenCredited}/payment`, { paidAt: '2026-11-01' });
+    // Le paiement est saisi le 1er novembre (une date de paiement future est refusée) ; l'avoir garde l'horloge de septembre
+    // pour que ces deux documents restent les plus anciens de la liste récente.
+    const res = await call(testApp(new Date('2026-11-01T10:00:00Z')), u, 'PUT', `/api/invoices/${paidThenCredited}/payment`, { paidAt: '2026-11-01' });
+    expect(res.status).toBe(200);
     await call(september, u, 'POST', `/api/invoices/${paidThenCredited}/credit-note`);
     await issuedInvoice(september, u, client.id, 120000);                             // échéance 1er octobre : en retard
     await issuedInvoice(app, u, client.id, 366000);                                   // à payer

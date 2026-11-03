@@ -234,6 +234,7 @@ export const invoiceRoutes = new Hono<AppEnv>()
     if (row.status !== 'issued' || row.kind === 'credit') throw notPayable;
     const { paidAt } = c.req.valid('json');
     if (paidAt && row.issue_date && paidAt < row.issue_date) throw new HttpError(409, 'paid_before_issue', 'La date de paiement précède la date d’émission.');
+    if (paidAt && paidAt > today(c)) throw new HttpError(409, 'paid_in_future', 'La date de paiement ne peut pas être dans le futur.');
     const res = await c.env.DB.prepare(
       "UPDATE invoices SET paid_at = ?, updated_at = ? WHERE id = ? AND user_id = ? AND status = 'issued' AND kind != 'credit'",
     ).bind(paidAt, nowIso(c), row.id, c.var.user.id).run();
