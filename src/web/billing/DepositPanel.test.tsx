@@ -21,3 +21,16 @@ it('reprend la maquette et crée un acompte en montant fixe', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Créer la facture d’acompte' }));
   expect(onCreate).toHaveBeenCalledWith({ mode: 'amount', cents: 50000 });
 });
+
+it('n’affiche que le titre, la raison et le bouton désactivé quand un acompte est impossible', () => {
+  const onCreate = vi.fn();
+  render(<DepositPanel totalCents={400000} alreadyInvoicedCents={120000} defaultBp={2000} disabledReason="Une facture de solde existe : plus d’acompte possible." onCreate={onCreate} />);
+  expect(screen.getByRole('heading', { name: 'Nouvel acompte' })).toBeInTheDocument();
+  expect(screen.getByText('Une facture de solde existe : plus d’acompte possible.')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Créer la facture d’acompte' })).toBeDisabled();
+  expect(screen.queryByText('Restera à facturer')).not.toBeInTheDocument();
+  expect(screen.queryByTestId('deposit-amount')).not.toBeInTheDocument();
+  expect(screen.queryByTestId('deposit-remaining')).not.toBeInTheDocument();
+  expect(screen.queryByLabelText('Pourcentage du total')).not.toBeInTheDocument();
+  expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+});

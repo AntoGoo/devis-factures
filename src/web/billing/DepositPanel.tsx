@@ -15,6 +15,19 @@ type Props = {
 export function DepositPanel({ totalCents, alreadyInvoicedCents, defaultBp, disabledReason, pending, onCreate }: Props) {
   const [mode, setMode] = useState<DepositMode>('percent');
   const [raw, setRaw] = useState(defaultBp ? percentInput(defaultBp) : '');
+
+  if (disabledReason) {
+    return (
+      <aside aria-labelledby="h-acompte" className="deposit-panel">
+        <h2 id="h-acompte" className="card-title">Nouvel acompte</h2>
+        <p className="field-hint">{disabledReason}</p>
+        <button type="button" className="btn btn-primary" style={{ justifyContent: 'center' }} disabled>
+          Créer la facture d’acompte
+        </button>
+      </aside>
+    );
+  }
+
   const p = depositPreview(totalCents, alreadyInvoicedCents, mode, raw);
   const label = mode === 'percent' ? 'Pourcentage du total' : 'Montant HT';
   const pick = (m: DepositMode) => { setMode(m); setRaw(''); };
@@ -31,8 +44,7 @@ export function DepositPanel({ totalCents, alreadyInvoicedCents, defaultBp, disa
       <div className="deposit-row"><span>Montant facturé</span><strong data-testid="deposit-amount">{p.amountCents === null ? '—' : formatEuros(p.amountCents)}</strong></div>
       <div className="deposit-row"><span>Restera à facturer</span><strong data-testid="deposit-remaining">{p.remainingAfterCents === null ? formatEuros(totalCents - alreadyInvoicedCents) : formatEuros(p.remainingAfterCents)}</strong></div>
       {p.error && <p className="field-error" role="alert">{p.error}</p>}
-      {disabledReason && <p className="field-hint">{disabledReason}</p>}
-      <button type="button" className="btn btn-primary" style={{ justifyContent: 'center' }} disabled={!p.input || !!disabledReason || pending} onClick={() => p.input && onCreate(p.input)}>
+      <button type="button" className="btn btn-primary" style={{ justifyContent: 'center' }} disabled={!p.input || pending} onClick={() => p.input && onCreate(p.input)}>
         Créer la facture d’acompte
       </button>
       <p className="deposit-note">Elle est créée en brouillon. Le numéro est attribué à l’émission, ensuite elle ne se modifie plus.</p>
