@@ -1,7 +1,11 @@
+import { Navigate } from 'react-router';
 import { authClient } from '../auth-client';
+import { useMe } from '../session/useMe';
 import './LoginPage.css';
 
 export function LoginPage() {
+  const me = useMe();
+  if (me.data) return <Navigate to="/" replace />;
   const signIn = () => authClient.signIn.social({ provider: 'google', callbackURL: '/', errorCallbackURL: '/acces-refuse' });
   return (
     <main className="login">

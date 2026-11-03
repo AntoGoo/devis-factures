@@ -1,8 +1,11 @@
-import { Link } from 'react-router';
+import { Link, Navigate } from 'react-router';
 import { authClient } from '../auth-client';
+import { useMe } from '../session/useMe';
 import './LoginPage.css';
 
 export function AccessDeniedPage() {
+  const me = useMe();
+  if (me.data) return <Navigate to="/" replace />;
   return (
     <main className="login">
       <section className="login-panel">
