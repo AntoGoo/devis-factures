@@ -159,6 +159,9 @@ export const invoiceRoutes = new Hono<AppEnv>()
     if (client.type === 'business' && !client.siren) {
       throw new HttpError(409, 'client_siren_required', 'Ajoutez le SIREN de ce client professionnel avant d’émettre la facture.');
     }
+    if (!client.street.trim() || !client.postalCode.trim() || !client.city.trim()) {
+      throw new HttpError(409, 'client_address_required', 'Complétez l’adresse de facturation du client (rue, code postal, ville) avant d’émettre la facture.');
+    }
     const lines = JSON.parse(inv.lines_json) as Line[];
     const problems = lineProblems(lines);
     if (problems.filledCount === 0) throw new HttpError(409, 'no_lines', 'Ajoutez au moins une ligne remplie.');

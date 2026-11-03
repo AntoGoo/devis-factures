@@ -71,6 +71,20 @@ describe('émission', () => {
     expect(await json(await issue(app, u, await standalone(app, u, client.id, [line(12000)], { dueDate: '2026-11-01' })))).toMatchObject({ error: 'due_before_issue' });
     expect((await json(await call(app, u, 'GET', '/api/numbering'))).series[1].next).toBe('F-2026-001');
   });
+
+  it('refuse l’émission tant que l’adresse de facturation du client est incomplète (spec § 8)', async () => {
+    const { u } = await ready();
+    for (const missing of ['street', 'postalCode', 'city'] as const) {
+      const partial = await seedClient(app, u, { ...CLIENT_BUSINESS, [missing]: '' });
+      const res = await issue(app, u, await standalone(app, u, partial.id));
+      expect(res.status).toBe(409);
+      expect(await json(res)).toEqual({
+        error: 'client_address_required',
+        message: 'Complétez l’adresse de facturation du client (rue, code postal, ville) avant d’émettre la facture.',
+      });
+    }
+    expect((await json(await call(app, u, 'GET', '/api/numbering'))).series[1].next).toBe('F-2026-001');
+  });
 });
 
 describe('acomptes et solde', () => {
