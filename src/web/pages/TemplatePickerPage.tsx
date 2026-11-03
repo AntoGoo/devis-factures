@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { DEFAULT_TEMPLATE_REF } from '../../templates/catalog';
 import { selectableTemplates } from '../../templates/registry';
 import { templateRef } from '../../templates/types';
@@ -54,5 +54,7 @@ export function TemplatePickerPage({ mode }: { mode: 'onboarding' | 'settings' }
       </div>
     </div>
   );
-  return mode === 'onboarding' ? <OnboardingLayout step={1}>{content}</OnboardingLayout> : content;
+  return mode === 'onboarding'
+    ? <OnboardingLayout step={1}>{content}</OnboardingLayout>
+    : <><Link className="back-link" to="/profil">← Profil entreprise</Link>{content}</>;
 }

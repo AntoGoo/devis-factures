@@ -102,3 +102,9 @@ it('indique le type de chaque client dans la liste, comme sur un devis', async (
   renderPage();
   expect(await screen.findByRole('option', { name: 'SCI Les Tilleuls (professionnel)' })).toBeInTheDocument();
 });
+
+it('propose un lien de retour vers la liste des factures', async () => {
+  stubApi();
+  renderPage();
+  expect(await screen.findByRole('link', { name: '← Factures' })).toHaveAttribute('href', '/factures');
+});

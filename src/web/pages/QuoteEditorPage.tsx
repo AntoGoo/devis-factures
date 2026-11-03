@@ -38,8 +38,9 @@ export function QuoteEditorPage() {
     },
   });
 
-  if (quote.isPending) return <p className="page-intro">Chargement…</p>;
-  if (quote.error) return <p className="notice notice-error" role="alert">{quote.error.message}</p>;
+  const back = <Link className="back-link" to="/devis">← Devis</Link>;
+  if (quote.isPending) return <>{back}<p className="page-intro">Chargement…</p></>;
+  if (quote.error) return <>{back}<p className="notice notice-error" role="alert">{quote.error.message}</p></>;
   const { quote: q, view } = quote.data;
   const status = QUOTE_STATUS[q.status];
   const editable = q.status === 'draft' || q.status === 'sent';
@@ -87,20 +88,23 @@ export function QuoteEditorPage() {
   );
 
   return (
-    <div className="page" style={{ maxWidth: 1120 }}>
-      {act.error && <p className="notice notice-error" role="alert">{act.error.message}</p>}
-      {editable ? (
-        <QuoteForm key={q.id} initial={quote.data} units={units} templateName={templateName} onSaved={() => qc.invalidateQueries({ queryKey: ['quotes'] })}>
-          {({ flush, saveState, payloadValid }) => header(flush, saveState, payloadValid)}
-        </QuoteForm>
-      ) : (
-        <>
-          {header()}
-          <p className="notice">Le contenu de ce devis est figé depuis son {q.status === 'accepted' ? 'acceptation' : 'refus'}.</p>
-          <div className="doc-sheet"><DocumentRenderer view={view} template={getTemplate(view.templateRef)} /></div>
-        </>
-      )}
-      {steps}
-    </div>
+    <>
+      {back}
+      <div className="page" style={{ maxWidth: 1120 }}>
+        {act.error && <p className="notice notice-error" role="alert">{act.error.message}</p>}
+        {editable ? (
+          <QuoteForm key={q.id} initial={quote.data} units={units} templateName={templateName} onSaved={() => qc.invalidateQueries({ queryKey: ['quotes'] })}>
+            {({ flush, saveState, payloadValid }) => header(flush, saveState, payloadValid)}
+          </QuoteForm>
+        ) : (
+          <>
+            {header()}
+            <p className="notice">Le contenu de ce devis est figé depuis son {q.status === 'accepted' ? 'acceptation' : 'refus'}.</p>
+            <div className="doc-sheet"><DocumentRenderer view={view} template={getTemplate(view.templateRef)} /></div>
+          </>
+        )}
+        {steps}
+      </div>
+    </>
   );
 }

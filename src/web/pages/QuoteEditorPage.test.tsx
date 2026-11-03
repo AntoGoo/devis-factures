@@ -68,3 +68,9 @@ it('bloque les actions de statut tant qu’un champ du devis est invalide, avec 
   // Le bouton « Supprimer le brouillon » n’est pas concerné par la validité du formulaire.
   expect(screen.getByRole('button', { name: 'Supprimer le brouillon' })).toBeEnabled();
 });
+
+it('propose un lien de retour vers la liste des devis', async () => {
+  stubApi();
+  renderPage();
+  expect(await screen.findByRole('link', { name: '← Devis' })).toHaveAttribute('href', '/devis');
+});

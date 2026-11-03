@@ -52,8 +52,9 @@ export function InvoicePage() {
   // Un refus du serveur s’affiche dans la boîte ouverte (sinon il resterait caché derrière elle).
   const dialogError = act.error && <p className="notice notice-error" role="alert">{act.error.message}</p>;
 
-  if (res.isPending) return <p className="page-intro">Chargement…</p>;
-  if (res.error) return <p className="notice notice-error" role="alert">{res.error.message}</p>;
+  const back = <Link className="back-link" to="/factures">← Factures</Link>;
+  if (res.isPending) return <>{back}<p className="page-intro">Chargement…</p></>;
+  if (res.error) return <>{back}<p className="notice notice-error" role="alert">{res.error.message}</p></>;
   const { invoice: inv, view, links } = res.data;
   const display = INVOICE_DISPLAY[inv.display];
   const title = inv.number ? `${inv.number} · ${view.title}` : `${INVOICE_KIND_LABEL[inv.kind]} (brouillon)`;
@@ -92,15 +93,17 @@ export function InvoicePage() {
 
   const notices = (
     <>
-      {dialog === null && dialogError}
-      {links.quote && <p className="notice">Issue du devis <Link to={`/devis/${links.quote.id}`}>{links.quote.number}</Link>{inv.kind !== 'standalone' && <> · <Link to={`/devis/${links.quote.id}/facturation`}>suivi de la facturation</Link></>}</p>}
-      {links.creditNote && <p className="notice notice-error">Annulée par l’avoir <Link to={`/factures/${links.creditNote.id}`}>{links.creditNote.number}</Link>.</p>}
-      {links.creditedInvoice && <p className="notice">Avoir de la facture <Link to={`/factures/${links.creditedInvoice.id}`}>{links.creditedInvoice.number}</Link>.</p>}
-      {inv.paidAt && <p className="notice">Payée le {formatDateShort(inv.paidAt)}.</p>}
+        {dialog === null && dialogError}
+        {links.quote && <p className="notice">Issue du devis <Link to={`/devis/${links.quote.id}`}>{links.quote.number}</Link>{inv.kind !== 'standalone' && <> · <Link to={`/devis/${links.quote.id}/facturation`}>suivi de la facturation</Link></>}</p>}
+        {links.creditNote && <p className="notice notice-error">Annulée par l’avoir <Link to={`/factures/${links.creditNote.id}`}>{links.creditNote.number}</Link>.</p>}
+        {links.creditedInvoice && <p className="notice">Avoir de la facture <Link to={`/factures/${links.creditedInvoice.id}`}>{links.creditedInvoice.number}</Link>.</p>}
+        {inv.paidAt && <p className="notice">Payée le {formatDateShort(inv.paidAt)}.</p>}
     </>
   );
 
   return (
+    <>
+    {back}
     <div className="page" style={{ maxWidth: 1120 }}>
       {inv.status === 'draft' && inv.kind !== 'credit' ? (
         <InvoiceForm key={inv.id} initial={res.data} units={units}>
@@ -153,5 +156,6 @@ export function InvoicePage() {
         </div>
       </Dialog>
     </div>
+    </>
   );
 }

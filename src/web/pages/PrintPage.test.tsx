@@ -82,3 +82,32 @@ it('n’imprime automatiquement qu’une fois, même si le document est relu (re
   await new Promise((resolve) => setTimeout(resolve, 100));
   expect(print).toHaveBeenCalledTimes(1);
 });
+
+function renderPrint(path: string) {
+  const view = buildDocumentView({ kind: 'quote', number: 'D-2026-016', date: '2026-10-31', templateRef: 'modele-02@1', profile: PROFILE_DATA, client: CLIENT_BUSINESS_DATA, object: '', interventionAddress: null, lines: MOCKUP_LINES, quoteTerms: { validityDays: 30, plannedStart: '', estimatedDuration: '', paymentTerms: '', plannedDepositBp: null } });
+  vi.stubGlobal('fetch', vi.fn(async () => Response.json({ view })));
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes><Route path="/imprimer/:type/:id" element={<PrintPage />} /></Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+it('ramène au devis, avec le logo, dans la barre masquée à l’impression', async () => {
+  renderPrint('/imprimer/devis/q1');
+  const back = await screen.findByRole('link', { name: '← Retour au devis' });
+  expect(back).toHaveAttribute('href', '/devis/q1');
+  expect(back.closest('.no-print')).not.toBeNull();
+  const brand = screen.getByRole('link', { name: 'Devis & Factures — accueil' });
+  expect(brand).toHaveAttribute('href', '/');
+  expect(brand.closest('.no-print')).not.toBeNull();
+});
+
+it('ramène à la facture pour l’aperçu d’une facture', async () => {
+  renderPrint('/imprimer/factures/x');
+  const back = await screen.findByRole('link', { name: '← Retour à la facture' });
+  expect(back).toHaveAttribute('href', '/factures/x');
+  expect(back.closest('.no-print')).not.toBeNull();
+});

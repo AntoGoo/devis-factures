@@ -1,19 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import type { DocumentView } from '../../shared/document';
 import { getTemplate } from '../../templates/registry';
 import { api } from '../api';
 import { DocumentRenderer } from '../document/DocumentRenderer';
 import { printTitle } from '../document/printTitle';
 import { useTemplateFonts } from '../document/useTemplateFonts';
+import { Brand } from '../layout/Brand';
 
 export const PRINT_HELP = 'Dans la fenêtre d’impression, choisissez « Enregistrer au format PDF » et décochez « En-têtes et pieds de page ».';
 
 export function PrintPage() {
   const { type, id } = useParams();
   const [params] = useSearchParams();
-  const navigate = useNavigate();
   const endpoint = type === 'factures' ? `/api/invoices/${id}` : `/api/quotes/${id}`;
   // Toujours relire le document : l’aperçu suit souvent une émission ou une correction.
   const doc = useQuery({ queryKey: ['print', type, id], queryFn: () => api<{ view: DocumentView }>('GET', endpoint), staleTime: 0, gcTime: 0 });
@@ -46,7 +46,10 @@ export function PrintPage() {
   return (
     <div className="print-page">
       <div className="print-toolbar no-print">
-        <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>Retour</button>
+        <Brand className="shell-brand" />
+        {type === 'factures'
+          ? <Link className="btn btn-secondary" to={`/factures/${id}`}>← Retour à la facture</Link>
+          : <Link className="btn btn-secondary" to={`/devis/${id}`}>← Retour au devis</Link>}
         <button type="button" className="btn btn-primary" onClick={() => window.print()}>Imprimer / PDF</button>
         <p className="print-help">{PRINT_HELP}</p>
       </div>
