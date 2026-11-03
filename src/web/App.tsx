@@ -7,6 +7,8 @@ import { ClientsPage } from './pages/ClientsPage';
 import { LinePresetsPage } from './pages/LinePresetsPage';
 import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { QuoteEditorPage } from './pages/QuoteEditorPage';
+import { QuotesListPage } from './pages/QuotesListPage';
 import { TemplatePickerPage } from './pages/TemplatePickerPage';
 import { queryClient } from './query';
 import { RequireAuth } from './session/RequireAuth';
@@ -24,6 +26,8 @@ export function App() {
             <Route element={<AppShell />}>
               <Route index element={<h1 className="page-title">Devis &amp; Factures</h1>} />
               <Route path="admin" element={<AdminPage />} />
+              <Route path="devis" element={<QuotesListPage />} />
+              <Route path="devis/:id" element={<QuoteEditorPage />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="lignes-types" element={<LinePresetsPage />} />
               <Route path="profil" element={<ProfilePage mode="settings" />} />
