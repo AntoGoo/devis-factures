@@ -30,5 +30,8 @@ export const SECURITY_HEADERS: Record<string, string> = {
 /** Pose les en-têtes de sécurité sur toutes les réponses du Worker, erreurs et réponses de Better Auth comprises. */
 export const securityHeaders: MiddlewareHandler = async (c, next) => {
   await next();
-  for (const [name, value] of Object.entries(SECURITY_HEADERS)) c.res.headers.set(name, value);
+  // c.res peut avoir des en-têtes immuables (Response.redirect, réponse d'un fetch) : on modifie une copie.
+  const res = new Response(c.res.body, c.res);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.headers.set(name, value);
+  c.res = res;
 };

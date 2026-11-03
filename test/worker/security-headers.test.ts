@@ -1,8 +1,9 @@
 import { env } from 'cloudflare:test';
+import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
 import assetHeadersFile from '../../public/_headers?raw';
 import { createApp } from '../../src/worker/app';
-import { SECURITY_HEADERS } from '../../src/worker/security-headers';
+import { SECURITY_HEADERS, securityHeaders } from '../../src/worker/security-headers';
 
 const EXPECTED: Record<string, string> = {
   'content-security-policy':
@@ -65,6 +66,16 @@ describe('en-têtes de sécurité', () => {
   it('sont posés sur une redirection de Better Auth', async () => {
     const res = await app.request('/api/auth/callback/google?error=access_denied', { redirect: 'manual' }, env);
     expect(res.status).toBe(302);
+    expectSecurityHeaders(res);
+  });
+
+  it('sont posés sur une réponse aux en-têtes immuables (Response.redirect)', async () => {
+    const redirecting = new Hono();
+    redirecting.use('*', securityHeaders);
+    redirecting.get('/', () => Response.redirect('https://example.test/', 302));
+    const res = await redirecting.request('/', { redirect: 'manual' });
+    expect(res.status).toBe(302);
+    expect(res.headers.get('location')).toBe('https://example.test/');
     expectSecurityHeaders(res);
   });
 
