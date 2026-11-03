@@ -100,18 +100,18 @@ export function InvoicePage() {
     <div className="page" style={{ maxWidth: 1120 }}>
       {inv.status === 'draft' && inv.kind !== 'credit' ? (
         <InvoiceForm key={inv.id} initial={res.data} units={units}>
-          {({ flush, saveState, payloadValid }) => (
+          {({ flush, saveState, payloadValid, totals }) => (
             <>
               {header(flush, saveState, payloadValid)}
               {notices}
               <div className="summary" style={{ maxWidth: 420 }}>
-                <div className="summary-row"><span>Total HT</span><span>{formatEuros(view.totals.totalHtCents)}</span></div>
+                <div className="summary-row"><span>Total HT</span><span>{formatEuros(totals.totalHtCents)}</span></div>
                 <div className="summary-vat">{view.vatMention}</div>
                 {view.deductions?.deposits.map((d) => (
                   <div key={d.invoiceId} className="summary-row"><span>Acompte {d.number}</span><span>{formatEuros(-d.amountCents)}</span></div>
                 ))}
                 <div className="summary-rule" />
-                <div className="summary-due"><span>{view.dueLabel}</span><strong>{formatEuros(view.totals.totalDueCents)}</strong></div>
+                <div className="summary-due"><span>{view.dueLabel}</span><strong>{formatEuros(totals.totalDueCents)}</strong></div>
               </div>
               <Dialog open={dialog === 'issue'} title="Émettre la facture" onClose={() => setDialog(null)}>
                 <p className="page-intro">Une fois émise, la facture reçoit son numéro définitif et ne peut plus être modifiée ni supprimée. Une erreur se corrige ensuite par un avoir.</p>

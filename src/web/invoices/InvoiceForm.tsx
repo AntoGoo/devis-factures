@@ -1,17 +1,20 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
 import type { InvoiceResponse } from '../../shared/api-types';
+import { computeBalance } from '../../shared/balance';
 import type { ClientData } from '../../shared/client';
 import { EDITABLE_FIELDS } from '../../shared/invoice';
+import type { Totals } from '../../shared/lines';
 import { api } from '../api';
 import { ClientFormDialog } from '../components/ClientFormDialog';
+import { liveTotals } from '../lines/lineDrafts';
 import { LinesEditor } from '../lines/LinesEditor';
 import { useAutosave } from '../lines/useAutosave';
 import { initialInvoiceForm, invoicePayload, type InvoiceFormState } from './invoiceForm';
 
 export function InvoiceForm({ initial, units, children }: {
   initial: InvoiceResponse; units: string[];
-  children: (ctx: { flush: () => Promise<void>; saveState: string; payloadValid: boolean }) => ReactNode;
+  children: (ctx: { flush: () => Promise<void>; saveState: string; payloadValid: boolean; totals: Totals }) => ReactNode;
 }) {
   const inv = initial.invoice;
   const kind = inv.kind as Exclude<typeof inv.kind, 'credit'>;
@@ -28,9 +31,15 @@ export function InvoiceForm({ initial, units, children }: {
   const set = <K extends keyof InvoiceFormState>(k: K, v: InvoiceFormState[K]) => setForm((f) => ({ ...f, [k]: v }));
   const saveState = { idle: '', pending: 'Modifications en attente…', saving: 'Enregistrement…', saved: 'Enregistré', error: `Échec de l’enregistrement : ${autosave.error?.message ?? ''}` }[autosave.state];
 
+  // Les lignes ne sont éditées qu'aux types qui l'autorisent (voir EDITABLE_FIELDS) : sinon on garde le total du serveur, qui ne bouge pas dans ce formulaire.
+  const totalHtCents = allowed.includes('lines') ? liveTotals(form.drafts).totalHtCents : inv.totalHtCents;
+  const deposits = initial.view.deductions?.deposits ?? [];
+  const totalDueCents = deposits.length > 0 ? computeBalance(totalHtCents, deposits).remainingCents : totalHtCents;
+  const totals: Totals = { totalHtCents, vatCents: 0, totalDueCents };
+
   return (
     <>
-      {children({ flush: autosave.flush, saveState, payloadValid: payload !== null })}
+      {children({ flush: autosave.flush, saveState, payloadValid: payload !== null, totals })}
       {(allowed.includes('clientId') || allowed.includes('object')) && (
         <section className="card form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
           <h2 className="card-title span-all">Client</h2>
