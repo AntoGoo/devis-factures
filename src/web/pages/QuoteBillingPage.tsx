@@ -80,10 +80,12 @@ export function QuoteBillingPage() {
               </div>
               <span className="bill-amount">{formatEuros(i.amountDueCents)}</span>
               <StatusBadge {...INVOICE_DISPLAY[i.display]} />
-              {(i.display === 'to_pay' || i.display === 'late') && (
-                <button type="button" className="btn btn-secondary" style={{ height: 40 }} onClick={() => markPaid.mutate(i.id)}>Marquer payée</button>
-              )}
-              <Link className="btn btn-secondary" style={{ height: 40 }} to={`/factures/${i.id}`}>Ouvrir</Link>
+              <div className="bill-actions">
+                {(i.display === 'to_pay' || i.display === 'late') && (
+                  <button type="button" className="btn btn-secondary" style={{ height: 40 }} onClick={() => markPaid.mutate(i.id)}>Marquer payée</button>
+                )}
+                <Link className="btn btn-secondary" style={{ height: 40 }} to={`/factures/${i.id}`}>Ouvrir</Link>
+              </div>
             </article>
           ))}
           {!b.activeFinal && (
