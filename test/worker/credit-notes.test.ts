@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createDeposit, seedAcceptedQuote, seedClient, seedProfile } from './fixtures';
+import { PROFILE, createDeposit, seedAcceptedQuote, seedClient, seedProfile } from './fixtures';
 import { call, createAllowedUser, json, testApp } from './helpers';
 
 const app = testApp();
@@ -43,6 +43,18 @@ describe('avoirs', () => {
     const original = await json(await call(app, u, 'GET', `/api/invoices/${id}`));
     expect(original.invoice).toMatchObject({ status: 'cancelled', display: 'cancelled' });
     expect(original.links.creditNote).toEqual({ id: credit.invoice.id, number: 'A-2026-001' });
+  });
+
+  it('répond 409 number_conflict quand le préfixe d’avoir reprend un ancien préfixe de facture déjà utilisé', async () => {
+    const { u, id } = await issuedStandalone(); // F-2026-001
+    expect((await call(app, u, 'PUT', '/api/profile', { ...PROFILE, prefixInvoice: 'FA', prefixCredit: 'F' })).status).toBe(200);
+    const res = await call(app, u, 'POST', `/api/invoices/${id}/credit-note`);
+    expect(res.status).toBe(409);
+    expect(await json(res)).toEqual({ error: 'number_conflict', message: 'Ce numéro existe déjà : vérifiez les préfixes de numérotation dans votre profil.' });
+    // Rien n'a changé : la facture reste émise, aucun avoir, aucun numéro consommé.
+    expect((await json(await call(app, u, 'GET', `/api/invoices/${id}`))).invoice.status).toBe('issued');
+    expect((await json(await call(app, u, 'GET', '/api/invoices?kind=credit'))).items).toEqual([]);
+    expect((await json(await call(app, u, 'GET', '/api/numbering'))).series[2].next).toBe('F-2026-001');
   });
 
   it('ne crée qu’un avoir par facture, même en cas de double clic (vigilance n° 3)', async () => {

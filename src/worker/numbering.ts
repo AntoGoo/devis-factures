@@ -1,4 +1,5 @@
 import type { Series } from '../shared/numbering';
+import { HttpError } from './errors';
 
 export type IssueTarget = {
   table: 'quotes' | 'invoices';
@@ -60,7 +61,16 @@ export async function runIssue(
   const before = opts.before ?? [];
   const [counter, update] = issueStatements(db, t);
   const read = db.prepare(`SELECT number FROM ${t.table} WHERE id = ? AND user_id = ?`).bind(t.docId, t.userId);
-  const results = await db.batch([...before, counter, update, read]);
+  let results: D1Result[];
+  try {
+    results = await db.batch([...before, counter, update, read]);
+  } catch (e) {
+    // Numéro déjà pris (préfixe réutilisé d'une autre série) : le batch est annulé en entier.
+    if (String(e).includes('UNIQUE') && String(e).includes('.number')) {
+      throw new HttpError(409, 'number_conflict', 'Ce numéro existe déjà : vérifiez les préfixes de numérotation dans votre profil.');
+    }
+    throw e;
+  }
   const updated = results[before.length + 1]!;
   const row = results[before.length + 2]!.results[0] as { number: string | null } | undefined;
   return { issued: updated.meta.changes === 1, number: row?.number ?? null };
