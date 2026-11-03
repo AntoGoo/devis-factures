@@ -9,9 +9,10 @@ const groupSiret = (s: string) => s.replace(/^(\d{3})(\d{3})(\d{3})(\d*)$/, '$1 
 const initialsOf = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('');
 
 export function DocumentRenderer({ view, template }: { view: DocumentView; template: TemplateModule }) {
-  const { company, client, labels } = { ...view, labels: template.labels };
+  const { company, client } = view;
+  const labels = template.labels;
   const qt = view.quoteTerms;
-  const it = view.invoiceTerms;
+  const invoiceTerms = view.invoiceTerms;
   return (
     <article className={`doc ${template.className} doc--${view.kind}`} lang="fr">
       <header className="doc-header">
@@ -111,15 +112,15 @@ export function DocumentRenderer({ view, template }: { view: DocumentView; templ
               {qt.paymentTerms && <p>Paiement : {qt.paymentTerms}</p>}
             </>
           )}
-          {it && (
+          {invoiceTerms && (
             <>
-              <p>Date de la prestation : {it.serviceDate ? formatDateLong(it.serviceDate) : 'date d’émission'}</p>
-              <p>Échéance : {it.dueDate ? formatDateLong(it.dueDate) : 'fixée à l’émission'}</p>
-              {it.paymentDetails && <p>Règlement : {it.paymentDetails}</p>}
-              <p>{it.latePenaltyText}</p>
-              {it.recoveryIndemnity && <p>{it.recoveryIndemnity}</p>}
-              <p>{it.discount}</p>
-              {it.notes && <p>{it.notes}</p>}
+              <p>Date de la prestation : {invoiceTerms.serviceDate ? formatDateLong(invoiceTerms.serviceDate) : 'date d’émission'}</p>
+              <p>Échéance : {invoiceTerms.dueDate ? formatDateLong(invoiceTerms.dueDate) : 'fixée à l’émission'}</p>
+              {invoiceTerms.paymentDetails && <p>Règlement : {invoiceTerms.paymentDetails}</p>}
+              <p>{invoiceTerms.latePenaltyText}</p>
+              {invoiceTerms.recoveryIndemnity && <p>{invoiceTerms.recoveryIndemnity}</p>}
+              <p>{invoiceTerms.discount}</p>
+              {invoiceTerms.notes && <p>{invoiceTerms.notes}</p>}
             </>
           )}
           {company.insurance && (
