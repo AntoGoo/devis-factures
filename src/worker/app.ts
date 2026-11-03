@@ -7,6 +7,7 @@ import { clientRoutes } from './routes/clients';
 import { meRoutes } from './routes/me';
 import { presetRoutes } from './routes/presets';
 import { profileRoutes } from './routes/profile';
+import { quoteRoutes } from './routes/quotes';
 import type { AppDeps, AppEnv } from './types';
 
 export function createApp(deps: AppDeps) {
@@ -27,6 +28,7 @@ export function createApp(deps: AppDeps) {
   api.route('/', profileRoutes);
   api.route('/clients', clientRoutes);
   api.route('/presets', presetRoutes);
+  api.route('/quotes', quoteRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);

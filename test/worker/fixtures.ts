@@ -1,6 +1,11 @@
+import type { QuoteResponse } from '../../src/shared/api-types';
 import type { ClientData, ClientInput } from '../../src/shared/client';
+import type { Line } from '../../src/shared/lines';
+import { MOCKUP_LINES } from '../../src/shared/test-fixtures';
 import type { SessionUser } from '../../src/worker/types';
 import { call, createAllowedUser, json, testApp } from './helpers';
+
+export { MOCKUP_LINES };
 
 type App = ReturnType<typeof testApp>;
 
@@ -48,6 +53,34 @@ export async function seedClient(app: App, user: SessionUser, overrides: Partial
   const res = await call(app, user, 'POST', '/api/clients', { ...CLIENT_BUSINESS, ...overrides });
   if (res.status !== 201) throw new Error(`client: ${res.status} ${await res.text()}`);
   return json<ClientData>(res);
+}
+
+export function quoteBody(clientId: string | null, lines: Line[] = MOCKUP_LINES) {
+  return {
+    clientId,
+    object: 'Rénovation électrique du rez-de-chaussée',
+    interventionAddress: '12 rue des Tilleuls, 44000 Nantes',
+    lines,
+    validityDays: 30,
+    plannedStart: 'Semaine du 23 novembre',
+    estimatedDuration: '4 jours',
+    paymentTerms: 'Acompte de 30 % à la signature, solde à réception de facture.',
+    plannedDepositBp: 3000,
+  };
+}
+
+export async function seedQuote(
+  app: App,
+  user: SessionUser,
+  opts: { clientId: string; lines?: Line[]; status?: 'draft' | 'sent' | 'accepted' },
+): Promise<QuoteResponse> {
+  const created = await json<QuoteResponse>(await call(app, user, 'POST', '/api/quotes', {}));
+  const id = created.quote.id;
+  let res = await call(app, user, 'PUT', `/api/quotes/${id}`, quoteBody(opts.clientId, opts.lines));
+  if (opts.status === 'sent' || opts.status === 'accepted') res = await call(app, user, 'POST', `/api/quotes/${id}/send`);
+  if (opts.status === 'accepted') res = await call(app, user, 'POST', `/api/quotes/${id}/accept`);
+  if (res.status !== 200) throw new Error(`quote: ${res.status} ${await res.text()}`);
+  return json<QuoteResponse>(res);
 }
 
 export async function twoUsers(app: App): Promise<{ a: SessionUser; b: SessionUser }> {
