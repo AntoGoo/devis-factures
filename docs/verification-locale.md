@@ -7,6 +7,7 @@ Date : 3 novembre 2026. Branche `feat/v1`. Rien n'est déployé.
 - Serveur de développement Vite + Worker lancé sur `http://localhost:5180` avec une D1 locale **neuve** (migrations `0001_auth` et `0002_core` appliquées sur un état vide), `BETTER_AUTH_URL` réglé sur cette adresse. Le serveur et sa configuration temporaire ont été supprimés à la fin.
 - Connexion sans Google grâce à `node scripts/dev-session.mjs <email>` : le script crée l'utilisateur et une session de 7 jours dans la D1 **locale**, puis affiche le cookie `better-auth.session_token` signé avec le `BETTER_AUTH_SECRET` de `.dev.vars`. Il refuse de tourner si `BETTER_AUTH_URL` n'est pas une adresse localhost (vérifié : « refus : BETTER_AUTH_URL (https://devis.example.com) n'est pas une adresse localhost », code de sortie 1). Avec le cookie, `GET /api/me` répond 200 ; sans cookie, 401.
 - Navigateur Chromium piloté par Playwright, viewport 1280 × 800. Les aperçus d'impression sont produits par le moteur d'impression de Chromium (PDF A4, sans en-têtes ni pieds de page), puis convertis en PNG page par page.
+- Suite de la vérification (corrections n° 6 à 8) : même méthode, sur une nouvelle D1 locale neuve et avec le superadmin seul. Captures concernées : 08, 19 (désormais liée), 20 à 32. Les aperçus d'impression sont produits par `page.pdf()` de Chromium (Playwright), après `emulateMedia('print')`, puis convertis en PNG avec `pdftoppm`.
 - Comptes : superadmin `antogouvrillon@gmail.com`, utilisateur invité `karim@example.test`, deuxième utilisateur `lea@example.test`, adresse non invitée `intrus@example.test`.
 
 ## Résultat point par point
@@ -17,10 +18,10 @@ Date : 3 novembre 2026. Branche `feat/v1`. Rien n'est déployé.
 | 2 | Superadmin : autoriser `karim@example.test`, « jamais connecté », adresse non invitée | ok ([accès](verification/02-admin-acces.png), [accès sur invitation](verification/03-acces-refuse.png)) |
 | 3 | Karim : choix du modèle → profil avec logo → tableau de bord vide | ok après correction n° 2 ([modèle](verification/04-choix-modele.png), [profil](verification/05-profil.png), [tableau de bord](verification/06-tableau-de-bord-vide.png)) |
 | 4 | Client professionnel avec SIREN, client particulier, deux lignes types | ok ([clients](verification/07-clients.png)) |
-| 5 | Devis de la maquette, ligne type, rechargement, envoi, acceptation | ok ([édition](verification/08-devis-edition.png), [envoyé](verification/09-devis-envoye.png), [accepté](verification/10-devis-accepte.png)) |
+| 5 | Devis de la maquette, ligne type, rechargement, envoi, acceptation | ok après correction n° 7 ([édition à 1280 px](verification/08-devis-edition.png), [à 1440 px](verification/08-devis-edition-1440.png), [liste des devis](verification/19-devis.png), [envoyé](verification/09-devis-envoye.png), [accepté](verification/10-devis-accepte.png)) |
 | 6 | Acompte, solde, avoir, nouveau solde | ok après correction n° 4 ([facturation](verification/11-facturation.png), [solde en brouillon](verification/12-facture-solde-brouillon.png), [après l'avoir](verification/13-facturation-apres-avoir.png)) |
 | 7 | Facture sans devis pour le particulier : pas de mention des 40 € | ok après correction n° 3 ([brouillon](verification/14-facture-directe-brouillon.png)) |
-| 8 | Aperçu d'impression dans les 3 modèles, devis de 40 lignes | ok après correction n° 5 ; mise en page sur 2 pages à trancher (voir « Décisions à prendre ») |
+| 8 | Aperçu d'impression dans les 3 modèles, devis de 40 lignes | ok après corrections n° 5 et 6 : chaque document de 5 lignes tient sur une page A4 |
 | 9 | Tableau de bord cohérent | ok ([capture](verification/15-tableau-de-bord.png)) |
 | 10 | Deuxième utilisateur : aucune donnée de Karim, même par l'adresse | ok ([document introuvable](verification/17-autre-utilisateur-facture-introuvable.png)) |
 | 11 | Console du navigateur | ok : aucune erreur JavaScript |
@@ -53,7 +54,18 @@ Choix du modèle « Discret » → « Votre entreprise » : logo PNG importé (a
 
 - « + Nouveau devis » crée un brouillon avec 5 lignes vides. Quatre lignes de la maquette ont été saisies, dont le prix `1 150,00`, puis la ligne type « Raccordement… » a été insérée dans la 5ᵉ ligne vide : total **2 920,00 €**, acompte prévu 30 % = **876,00 €**.
 - Rechargement de la page après l'enregistrement automatique : client, objet, les 5 lignes, modalités et acompte prévu sont tous conservés.
+- La liste des devis montre le brouillon et les devis acceptés avec leur statut ([capture](verification/19-devis.png)).
 - « Marquer comme envoyé » → **D-2026-001**, « Envoyé ». « Marquer comme accepté » → contenu figé (« Le contenu de ce devis est figé depuis son acceptation »), actions « Facturer » et « Dupliquer ».
+
+**Anomalie n° 7, corrigée** : dans l'éditeur de devis, à 1265 px de large, la colonne « Total HT » était tronquée (« 380,0 »), les boutons de ligne (↑ ↓ ☆ ×) étaient hors champ et la désignation très étroite : le tableau des lignes (820 px minimum) ne tenait pas à côté du récapitulatif. Correction : colonnes et boutons de ligne resserrés (tableau de 680 px minimum) et, dans l'éditeur de devis, le récapitulatif passe sous le formulaire, ses deux blocs côte à côte, dès que la colonne principale ferait moins de 760 px (fenêtre de moins de 1380 px environ). Mesures dans Chromium, sans défilement horizontal du tableau ni de la page, totaux complets et 4 boutons visibles :
+
+| Largeur | Devis brouillon | Facture de solde brouillon |
+|---|---|---|
+| 1280 px | récapitulatif sous le formulaire, champ désignation 396 px ([capture](verification/08-devis-edition.png)) | champ désignation 396 px ([capture](verification/32-facture-brouillon-1280.png)) |
+| 1440 px | récapitulatif à droite comme dans la maquette, champ désignation 208 px ([capture](verification/08-devis-edition-1440.png)) | champ désignation 532 px ([capture](verification/32-facture-brouillon-1440.png)) |
+| 900 px (tablette) | défilement horizontal limité au tableau des lignes | idem |
+
+Les captures 08 et 32 ont été prises après la correction, avec un autre jeu de données que le reste du parcours (objet « Rénovation électrique du rez-de-chaussée »).
 
 ### 6. Facturation
 
@@ -77,13 +89,25 @@ Les trois modèles, chacun avec un devis, une facture de solde avec déduction d
 
 | Modèle | Devis | Facture de solde | Avoir |
 |---|---|---|---|
-| Discret (modele-02) | [p. 1](verification/20-discret-devis-1.png) | [p. 1](verification/21-discret-facture-solde-1.png), [p. 2](verification/21-discret-facture-solde-2.png) | [p. 1](verification/22-discret-avoir-1.png), [p. 2](verification/22-discret-avoir-2.png) |
-| Intemporel (modele-01) | [p. 1](verification/23-intemporel-devis-1.png) | [p. 1](verification/24-intemporel-facture-solde-1.png), [p. 2](verification/24-intemporel-facture-solde-2.png) | [p. 1](verification/25-intemporel-avoir-1.png), [p. 2](verification/25-intemporel-avoir-2.png) |
-| Raffiné (modele-03) | [p. 1](verification/26-raffine-devis-1.png), [p. 2](verification/26-raffine-devis-2.png) | [p. 1](verification/27-raffine-facture-solde-1.png), [p. 2](verification/27-raffine-facture-solde-2.png) | [p. 1](verification/28-raffine-avoir-1.png), [p. 2](verification/28-raffine-avoir-2.png) |
+| Discret (modele-02) | [1 page](verification/20-discret-devis-1.png) | [1 page](verification/21-discret-facture-solde-1.png) | [1 page](verification/22-discret-avoir-1.png) |
+| Intemporel (modele-01) | [1 page](verification/23-intemporel-devis-1.png) | [1 page](verification/24-intemporel-facture-solde-1.png) | [1 page](verification/25-intemporel-avoir-1.png) |
+| Raffiné (modele-03) | [1 page](verification/26-raffine-devis-1.png) | [1 page](verification/27-raffine-facture-solde-1.png) | [1 page](verification/28-raffine-avoir-1.png) |
 
 Le titre de l'onglet, qui devient le nom proposé pour le PDF, vaut par exemple « F-2026-003 – SCI Les Tilleuls », ou « Devis (brouillon) – SCI Les Tilleuls » pour un brouillon.
 
-Devis de 40 lignes, dont 6 désignations longues sur 4 lignes : 3 pages en Discret et en Intemporel, 4 en Raffiné. Sur chaque page de lignes, l'en-tête du tableau est répété et aucune ligne n'est coupée : chaque « Ligne n » apparaît sur une seule page, d'après une vérification du texte du PDF page par page. Totaux, modalités et bon pour accord restent groupés. Captures : Discret [p. 1](verification/30-devis-40-lignes-discret-1.png), [p. 2](verification/30-devis-40-lignes-discret-2.png), [p. 3](verification/30-devis-40-lignes-discret-3.png) ; Raffiné [p. 2](verification/31-devis-40-lignes-raffine-2.png), [p. 3](verification/31-devis-40-lignes-raffine-3.png).
+Devis de 40 lignes, dont 6 désignations longues sur 4 lignes : 3 pages dans les trois modèles après la correction n° 6 (4 avant, avec le jeu de données décrit plus bas). Sur chaque page de lignes, l'en-tête du tableau est répété et aucune ligne n'est coupée : chaque « Ligne n » apparaît sur une seule page, d'après une vérification du texte du PDF page par page. Totaux, modalités et bon pour accord restent groupés. Captures : Discret [p. 1](verification/30-devis-40-lignes-discret-1.png), [p. 2](verification/30-devis-40-lignes-discret-2.png), [p. 3](verification/30-devis-40-lignes-discret-3.png) ; Raffiné [p. 2](verification/31-devis-40-lignes-raffine-2.png), [p. 3](verification/31-devis-40-lignes-raffine-3.png).
+
+**Correction n° 6 : une page A4 par document de 5 lignes.** Avant, le bloc « Modalités », qui ne doit pas être coupé, partait seul en page 2. Les modèles `v1` n'ayant encore produit aucun document réel, ils ont été retouchés en place : marges `@page` de 10 × 12 mm (au lieu de 12 × 14), texte à 14 px (15 avant) et 12 px pour les modalités, espacements, remplissages et interlignes resserrés ; sur une facture ou un avoir, sans bon pour accord, les modalités prennent toute la largeur. Discret : numéro et date restent sur une ligne. Raffiné : logo limité à 44 px de haut. Couleurs, polices et disposition des maquettes sont inchangées. Les règles de pagination ne bougent pas.
+
+Preuve : PDF A4 produits par Chromium (`page.pdf()` après `emulateMedia('print')`, sans en-têtes ni pieds de page, marges de la feuille de style), nombre de pages lu avec `pdfinfo`. Jeu de données : profil avec logo PNG, client professionnel avec adresse d'intervention, 5 lignes de la maquette, modalités, assurance ; facture de solde avec un acompte déduit et toutes les mentions (prestation, échéance, IBAN, pénalités, indemnité de 40 €, escompte) ; avoir de cette facture (deux références).
+
+| Modèle | Devis | Facture de solde | Avoir | Devis de 40 lignes |
+|---|---|---|---|---|
+| Discret | 2 → **1** | 2 → **1** | 2 → **1** | 4 → 3 |
+| Intemporel | 1 → **1** | 2 → **1** | 2 → **1** | 4 → 3 |
+| Raffiné | 2 → **1** | 2 → **1** | 2 → **1** | 4 → 3 |
+
+Hauteur occupée après correction, pour 1 047 px utiles : de 836 px (devis Intemporel) à 1 025 px (avoir Raffiné). Avec ce jeu de données, le devis Discret faisait aussi 2 pages avant correction, à cause du numéro et de la date qui passaient sur deux lignes. Les captures 20 à 31 ont été régénérées.
 
 **Anomalie n° 5, corrigée** : à l'impression avec « Graphiques d'arrière-plan », la fin de la dernière page était remplie du fond gris de l'application. Selon l'ordre de chargement des feuilles de style, la règle `body` de `base.css` l'emportait sur la règle d'impression. Correction : la règle d'impression est plus spécifique (`html body`) et la page d'aperçu n'impose plus de hauteur minimale à l'impression. Seule l'enveloppe de la page est modifiée, pas les modèles (commit `0e5f245`). Les 9 aperçus ont été régénérés : fond blanc.
 
@@ -114,11 +138,27 @@ Aucune erreur JavaScript ni avertissement pendant tout le parcours. Les seules l
 | 3 | Facture : type de client absent de la liste | libellé commun `CLIENT_TYPE_LABEL` | `InvoicePage.test.tsx` | `46edf71` |
 | 4 | Liste des factures : avoirs du jour en fin de liste | tri secondaire sur la date de création | `credit-notes.test.ts` | `6cccc42` |
 | 5 | Impression : fond gris sous le document | règle d'impression plus spécifique | visuel (PDF) | `0e5f245` |
+| 6 | Impression : un document de 5 lignes sur 2 pages | modèles `v1` resserrés (marges, tailles, espacements) | nombre de pages des PDF | `4fa3683` |
+| 7 | Éditeur de lignes tronqué à 1265 px | colonnes resserrées, récapitulatif sous le formulaire sous 760 px | mesures et captures à 1280 et 1440 px | `08434b8` |
+| 8 | Tests Worker qui échouent parfois | délai par test porté à 30 s (voir ci-dessous) | 20 + 5 + 3 exécutions vertes | `3048bbf` |
+
+### Tests Worker : échecs intermittents
+
+Lors de la tâche 25, 3 tests Worker avaient échoué une fois. Exécutions faites pour l'enquête :
+
+- `npx vitest run -c vitest.worker.config.ts test/worker/quotes.test.ts` : 20 exécutions, 20 vertes (13/13) ;
+- suite Worker complète : 5 exécutions, 5 vertes (114/114) ;
+- suite Worker complète, 14 exécutions de plus avant correction, dont 9 avec relevé des durées par test, 2 sous charge CPU artificielle (16 puis 48 processus), 1 avec écritures disque continues et 2 pendant un build et la génération des PDF : **2 ont échoué** (3 tests, puis 1 test), toutes deux sans charge particulière.
+
+Cause : dans ces deux exécutions, tous les tests étaient 3 à 4 fois plus lents d'un bout à l'autre (somme des durées : 93 à 113 s au lieu de 26 à 28 s). Les tests en échec sont exactement ceux qui ont dépassé 5 000 ms, le délai par défaut de Vitest : tableau de bord (7 014 et 6 609 ms, 1,7 à 1,8 s d'ordinaire), `invoices-drafts` « limite les champs modifiables… » (6 347 ms), `quotes` « liste les devis… » (6 246 ms). L'erreur est celle du délai dépassé (`Test timed out in 5000ms`). Ce n'est ni un état D1 partagé, ni le nettoyage `beforeEach`, ni l'horloge : chaque test passe dès qu'on lui laisse le temps. Avec `--testTimeout=1500`, le même échec se reproduit à coup sûr sur le test du tableau de bord. La lenteur ponctuelle vient de l'environnement : 16 fichiers lancés en même temps, chacun avec son runtime workerd et sa D1. Elle n'a pas été reproduite à la demande, ni avec 48 processus qui saturent le CPU ni avec des écritures disque continues.
+
+Correction : `testTimeout: 30_000` dans `vitest.worker.config.ts`, soit 16 fois la durée normale du test le plus long. Après correction : `npm test` 3 fois de suite, chaque fois avec le serveur de développement lancé sur un autre port : 3 fois vert (156/156 et 114/114).
 
 ## Décisions à prendre
 
-1. **Un document de 5 lignes s'imprime sur 2 pages.** C'est le cas dans les trois modèles pour une facture ou un avoir, et en Raffiné pour un devis. Le bloc « Modalités » (mentions légales comprises) part seul en page 2, car il est trop haut pour la place restante et ne doit pas être coupé. Mesures faites dans le navigateur en ajoutant des règles d'impression plus compactes : texte à 13 px au lieu de 15, interlignes et espacements réduits, bloc « Modalités » sur toute la largeur quand il n'y a pas de bon pour accord. La facture tient alors sur 1 page en Discret et en Intemporel, 2 en Raffiné, et le devis Raffiné tient sur 1 page. Changer l'apparence des modèles touche la règle « un modèle publié n'est jamais modifié en place ». Comme rien n'est encore publié, une retouche des `v1` reste possible avant le déploiement ; sinon il faudra des `v2`. Choix à faire : accepter 2 pages, ou compacter l'impression (et dans ce cas, valider la nouvelle apparence).
-2. Point mineur, non corrigé : à l'écran, l'espace fin insécable des milliers (`2 044,00 €`, produit par `Intl.NumberFormat`) est presque invisible dans la police Manrope en gras (« 2044,00 € » sur l'écran Facturation). C'est conforme à la contrainte de format, mais on peut préférer un espace insécable normal à l'affichage.
+1. Point mineur, non corrigé : à l'écran, l'espace fin insécable des milliers (`2 044,00 €`, produit par `Intl.NumberFormat`) est presque invisible dans la police Manrope en gras (« 2044,00 € » sur l'écran Facturation). C'est conforme à la contrainte de format, mais on peut préférer un espace insécable normal à l'affichage.
+
+La question « accepter 2 pages ou compacter l'impression » est tranchée : l'impression a été compactée (correction n° 6), et chaque document de 5 lignes tient sur une page A4 dans les trois modèles.
 
 ## Essayer vous-même
 
