@@ -43,28 +43,34 @@ export function QuoteEditorPage() {
   const editable = q.status === 'draft' || q.status === 'sent';
   const templateName = getTemplate(view.templateRef).meta.name;
 
-  const header = (flush?: () => Promise<void>, saveState = '') => (
-    <div className="page-head" style={{ alignItems: 'center' }}>
-      <div className="actions" style={{ alignItems: 'center' }}>
-        <h1 className="page-title" style={{ fontSize: 32 }}>{q.number ?? 'Nouveau devis'}</h1>
-        <StatusBadge tone={status.tone} label={q.status === 'draft' ? 'Brouillon · numéro attribué à l’envoi' : status.label} />
-        {saveState && <span className="field-hint" role="status">{saveState}</span>}
+  const header = (flush?: () => Promise<void>, saveState = '', payloadValid = true) => {
+    const actions = quoteActions(q.status);
+    const statusChangeBlocked = !payloadValid && actions.some((a) => a === 'send' || a === 'accept' || a === 'refuse');
+    return (
+      <div className="page-head" style={{ alignItems: 'center' }}>
+        <div className="actions" style={{ alignItems: 'center' }}>
+          <h1 className="page-title" style={{ fontSize: 32 }}>{q.number ?? 'Nouveau devis'}</h1>
+          <StatusBadge tone={status.tone} label={q.status === 'draft' ? 'Brouillon · numéro attribué à l’envoi' : status.label} />
+          {saveState && <span className="field-hint" role="status">{saveState}</span>}
+        </div>
+        <div className="actions" style={{ alignItems: 'center' }}>
+          {actions.map((a) => {
+            const labels: Record<QuoteAction, string> = { send: 'Marquer comme envoyé', accept: 'Marquer comme accepté', refuse: 'Marquer comme refusé', duplicate: 'Dupliquer', delete: 'Supprimer le brouillon' };
+            const confirmText: Partial<Record<QuoteAction, string>> = { accept: 'Le contenu du devis sera figé. Continuer ?', refuse: 'Le devis sera figé comme refusé. Continuer ?', delete: 'Supprimer ce brouillon ?' };
+            const primary = a === 'send' || a === 'accept';
+            const blockedByInvalidForm = (a === 'send' || a === 'accept' || a === 'refuse') && !payloadValid;
+            return (
+              <button key={a} type="button" className={primary ? 'btn btn-primary' : a === 'delete' ? 'btn btn-danger' : 'btn btn-secondary'} disabled={act.isPending || blockedByInvalidForm}
+                onClick={() => (!confirmText[a] || window.confirm(confirmText[a])) && act.mutate({ action: a, flush })}>
+                {labels[a]}
+              </button>
+            );
+          })}
+          {statusChangeBlocked && <span className="field-hint" role="status">Corrigez les champs en rouge avant de continuer.</span>}
+        </div>
       </div>
-      <div className="actions">
-        {quoteActions(q.status).map((a) => {
-          const labels: Record<QuoteAction, string> = { send: 'Marquer comme envoyé', accept: 'Marquer comme accepté', refuse: 'Marquer comme refusé', duplicate: 'Dupliquer', delete: 'Supprimer le brouillon' };
-          const confirmText: Partial<Record<QuoteAction, string>> = { accept: 'Le contenu du devis sera figé. Continuer ?', refuse: 'Le devis sera figé comme refusé. Continuer ?', delete: 'Supprimer ce brouillon ?' };
-          const primary = a === 'send' || a === 'accept';
-          return (
-            <button key={a} type="button" className={primary ? 'btn btn-primary' : a === 'delete' ? 'btn btn-danger' : 'btn btn-secondary'} disabled={act.isPending}
-              onClick={() => (!confirmText[a] || window.confirm(confirmText[a])) && act.mutate({ action: a, flush })}>
-              {labels[a]}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const steps = (
     <ol aria-label="Étapes du devis" className="steps-list">
@@ -81,7 +87,7 @@ export function QuoteEditorPage() {
       {act.error && <p className="notice notice-error" role="alert">{act.error.message}</p>}
       {editable ? (
         <QuoteForm key={q.id} initial={quote.data} units={units} templateName={templateName} onSaved={() => qc.invalidateQueries({ queryKey: ['quotes'] })}>
-          {({ flush, saveState }) => header(flush, saveState)}
+          {({ flush, saveState, payloadValid }) => header(flush, saveState, payloadValid)}
         </QuoteForm>
       ) : (
         <>

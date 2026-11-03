@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type SaveState = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
-/** Enregistre `value` 800 ms après la dernière modification ; `flush` force l'enregistrement. */
+/** Enregistre `value` 800 ms après la dernière modification ; `flush` force l'enregistrement et rejette si l'enregistrement échoue. */
 export function useAutosave<T>(value: T, save: (v: T) => Promise<unknown>, { enabled, delay = 800 }: { enabled: boolean; delay?: number }) {
   const [state, setState] = useState<SaveState>('idle');
   const [error, setError] = useState<Error | null>(null);
@@ -24,20 +24,22 @@ export function useAutosave<T>(value: T, save: (v: T) => Promise<unknown>, { ena
       setError(null);
       setState('saved');
     } catch (e) {
-      setError(e as Error);
+      const err = e as Error;
+      setError(err);
       setState('error');
+      throw err; // les appelants qui attendent flush() (ex. avant de changer le statut) doivent échouer aussi
     }
   }, []);
 
   useEffect(() => {
     if (!enabled || serialized === lastSaved.current) return;
     setState('pending');
-    timer.current = setTimeout(() => void flush(), delay);
+    timer.current = setTimeout(() => { void flush().catch(() => {}); }, delay);
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [serialized, enabled, delay, flush]);
 
-  // Enregistre ce qui reste en attente quand l'utilisateur quitte la page.
-  useEffect(() => () => void flush(), [flush]);
+  // Enregistre ce qui reste en attente quand l'utilisateur quitte la page ; l'erreur est déjà reflétée dans `state`/`error`.
+  useEffect(() => () => { void flush().catch(() => {}); }, [flush]);
 
   return { state, error, flush };
 }

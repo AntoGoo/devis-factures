@@ -26,11 +26,13 @@ describe('useAutosave', () => {
     expect(result.current.state).toBe('saved');
   });
 
-  it('enregistre immédiatement sur flush et passe en erreur si l’envoi échoue', async () => {
+  it('enregistre immédiatement sur flush, passe en erreur et rejette si l’envoi échoue', async () => {
     const save = vi.fn(async () => { throw new Error('Réseau'); });
     const { rerender, result } = renderHook(({ v }) => useAutosave(v, save, { enabled: true }), { initialProps: { v: { a: 1 } } });
     rerender({ v: { a: 2 } });
-    await act(async () => { await result.current.flush(); });
+    await act(async () => {
+      await expect(result.current.flush()).rejects.toThrow('Réseau');
+    });
     expect(save).toHaveBeenCalledTimes(1);
     expect(result.current.state).toBe('error');
     expect(result.current.error?.message).toBe('Réseau');
@@ -41,6 +43,14 @@ describe('useAutosave', () => {
     const { rerender } = renderHook(({ v, ok }) => useAutosave(v, save, { enabled: ok }), { initialProps: { v: { a: 1 }, ok: true } });
     rerender({ v: { a: 2 }, ok: false });
     vi.advanceTimersByTime(2000);
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('ne tente aucun enregistrement au démontage quand la saisie est invalide (enabled: false)', () => {
+    const save = vi.fn(async () => {});
+    const { rerender, unmount } = renderHook(({ v, ok }) => useAutosave(v, save, { enabled: ok }), { initialProps: { v: { a: 1 }, ok: false } });
+    rerender({ v: { a: 2 }, ok: false });
+    unmount();
     expect(save).not.toHaveBeenCalled();
   });
 });
