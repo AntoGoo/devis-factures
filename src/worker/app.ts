@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { createAuth } from './auth';
 import { onError } from './errors';
 import { requireUser, sameOrigin } from './middleware';
 import { meRoutes } from './routes/me';
@@ -14,6 +15,7 @@ export function createApp(deps: AppDeps) {
 
   // Routes publiques : déclarées AVANT l'API protégée, elles répondent sans passer par requireUser.
   app.get('/api/health', (c) => c.json({ ok: true }));
+  app.on(['GET', 'POST'], '/api/auth/*', (c) => createAuth(c.env).handler(c.req.raw));
 
   const api = new Hono<AppEnv>();
   api.use('*', sameOrigin, requireUser);

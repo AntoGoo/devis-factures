@@ -1,9 +1,12 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
-import { expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { App } from './App';
 
-it('affiche le nom de l’application', () => {
+afterEach(() => vi.unstubAllGlobals());
+
+it('affiche la connexion quand personne n’est connecté', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ error: 'unauthenticated', message: '' }), { status: 401 })));
   render(<App />);
-  expect(screen.getByText('Devis & Factures')).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Connexion' })).toBeInTheDocument();
 });

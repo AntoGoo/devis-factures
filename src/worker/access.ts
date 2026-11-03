@@ -27,3 +27,24 @@ export async function recordLogin(db: D1Database, email: string, at: Date): Prom
     .bind(normalizeEmail(email), at.toISOString())
     .run();
 }
+
+export class NotInvitedError extends Error {
+  constructor() {
+    super('not_invited');
+  }
+}
+
+/** Crochets Better Auth appliquant la liste d'accès à la création de compte et de session. */
+export function accessHooks(env: { DB: D1Database; SUPERADMIN_EMAIL: string }, now: () => Date) {
+  const assertInvited = async (email: string | null) => {
+    if (!email || !(await isEmailAllowed(env.DB, env.SUPERADMIN_EMAIL, email))) throw new NotInvitedError();
+  };
+  return {
+    beforeUserCreate: (email: string) => assertInvited(email),
+    beforeSessionCreate: async (userId: string) => assertInvited(await emailOfUser(env.DB, userId)),
+    afterSessionCreate: async (userId: string) => {
+      const email = await emailOfUser(env.DB, userId);
+      if (email) await recordLogin(env.DB, email, now());
+    },
+  };
+}

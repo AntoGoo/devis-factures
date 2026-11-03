@@ -1,0 +1,18 @@
+.shell { min-height: 100vh; display: flex; flex-wrap: wrap; }
+.shell-nav { flex: 1 1 232px; max-width: 100%; background: var(--c-surface); border-right: 1px solid var(--c-border); padding: 28px 16px; display: flex; flex-direction: column; gap: 28px; }
+.shell-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; font-family: var(--font-display); font-weight: 700; font-size: 17px; }
+.shell-brand .brand-mark { width: 32px; height: 32px; border-radius: 9px; background: var(--c-primary); color: #FFFFFF; display: flex; align-items: center; justify-content: center; }
+.shell-links, .shell-bottom { display: flex; flex-direction: column; gap: 4px; font-size: 15px; font-weight: 600; }
+.shell-bottom { margin-top: auto; }
+.shell-link { padding: 11px 12px; border-radius: 10px; text-decoration: none; }
+.shell-link.active { background: var(--c-primary-soft); color: var(--c-primary-strong); }
+.shell-user { display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid var(--c-border); font-size: 13px; }
+.shell-user > div { display: flex; flex-direction: column; }
+.shell-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--c-avatar); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.shell-user-name { font-weight: 700; }
+.shell-user-company { color: var(--c-text-muted); }
+.shell-logout { margin: 8px; background: none; border: none; color: var(--c-text-muted); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.shell-main { flex: 999 1 560px; min-width: 0; padding: 32px 32px 64px; }
+.page { max-width: 1080px; display: flex; flex-direction: column; gap: 24px; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
