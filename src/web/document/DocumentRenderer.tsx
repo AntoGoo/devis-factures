@@ -114,8 +114,15 @@ export function DocumentRenderer({ view, template }: { view: DocumentView; templ
           )}
           {invoiceTerms && (
             <>
-              <p>Date de la prestation : {invoiceTerms.serviceDate ? formatDateLong(invoiceTerms.serviceDate) : 'date d’émission'}</p>
-              <p>Échéance : {invoiceTerms.dueDate ? formatDateLong(invoiceTerms.dueDate) : 'fixée à l’émission'}</p>
+              {view.kind === 'credit' ? (
+                // Avoir : pas d'échéance ; date de prestation de la facture annulée, quand elle est connue.
+                invoiceTerms.serviceDate && <p>Date de la prestation : {formatDateLong(invoiceTerms.serviceDate)}</p>
+              ) : (
+                <>
+                  <p>Date de la prestation : {invoiceTerms.serviceDate ? formatDateLong(invoiceTerms.serviceDate) : 'date d’émission'}</p>
+                  <p>Échéance : {invoiceTerms.dueDate ? formatDateLong(invoiceTerms.dueDate) : 'fixée à l’émission'}</p>
+                </>
+              )}
               {invoiceTerms.paymentDetails && <p>Règlement : {invoiceTerms.paymentDetails}</p>}
               <p>{invoiceTerms.latePenaltyText}</p>
               {invoiceTerms.recoveryIndemnity && <p>{invoiceTerms.recoveryIndemnity}</p>}

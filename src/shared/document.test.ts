@@ -93,7 +93,19 @@ describe('buildCreditView', () => {
     expect(credit.totals).toEqual({ totalHtCents: -292000, vatCents: 0, totalDueCents: -204400 });
     expect(credit.dueLabel).toBe('Montant de l’avoir');
     expect(credit.references.creditedInvoice).toEqual({ number: 'F-2026-027', date: '2026-11-03' });
-    expect(credit.invoiceTerms).toBeNull();
+  });
+
+  it('porte les mentions de facture : prestation d’origine, pénalités, indemnité, escompte, règlement, sans échéance', () => {
+    const original = { ...buildDocumentView(invoiceInput({ invoiceDates: { serviceDate: '2026-11-02', dueDate: '2026-12-03', notes: 'Note de la facture' } })), number: 'F-2026-027' };
+    const ctx = { date: '2026-11-10', templateRef: 'modele-01@1', profile: { ...PROFILE_DATA, paymentDetails: 'IBAN actuel' }, creditedRef: { number: 'F-2026-027', date: '2026-11-03' } };
+    expect(buildCreditView(original, { ...ctx, client: CLIENT_BUSINESS_DATA }).invoiceTerms).toEqual({
+      serviceDate: '2026-11-02', dueDate: null, latePenaltyText: PROFILE_DATA.latePenaltyText, recoveryIndemnity: RECOVERY_INDEMNITY_MENTION,
+      discount: NO_DISCOUNT_MENTION, paymentDetails: 'IBAN actuel', notes: '',
+    });
+    // L'indemnité de 40 € suit le client courant.
+    expect(buildCreditView(original, { ...ctx, client: CLIENT_INDIVIDUAL_DATA }).invoiceTerms?.recoveryIndemnity).toBeNull();
+    // Sans date de prestation connue dans l'instantané, l'avoir n'en invente pas.
+    expect(buildCreditView({ ...original, invoiceTerms: null }, { ...ctx, client: CLIENT_BUSINESS_DATA }).invoiceTerms?.serviceDate).toBeNull();
   });
 });
 

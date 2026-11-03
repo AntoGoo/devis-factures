@@ -102,6 +102,23 @@ function clientBlock(c: ClientData | null): ClientBlock | null {
   return c ? { type: c.type, name: c.name, street: c.street, postalCode: c.postalCode, city: c.city, siren: c.siren } : null;
 }
 
+/** Mentions de paiement d'une facture ou d'un avoir (spec § 8) ; l'indemnité de 40 € ne vise que les clients professionnels. */
+function paymentTerms(
+  profile: ProfileData,
+  client: ClientData | null,
+  dates: Pick<InvoiceTerms, 'serviceDate' | 'dueDate' | 'notes'>,
+): InvoiceTerms {
+  return {
+    serviceDate: dates.serviceDate,
+    dueDate: dates.dueDate,
+    latePenaltyText: profile.latePenaltyText,
+    recoveryIndemnity: client?.type === 'business' ? RECOVERY_INDEMNITY_MENTION : null,
+    discount: NO_DISCOUNT_MENTION,
+    paymentDetails: profile.paymentDetails,
+    notes: dates.notes,
+  };
+}
+
 export function buildDocumentView(input: BuildViewInput): DocumentView {
   const lines = filledLines(input.lines);
   const totals = computeTotals(lines);
@@ -128,21 +145,20 @@ export function buildDocumentView(input: BuildViewInput): DocumentView {
     deductions: hasDeductions ? { deposits, remainingCents: balance.remainingCents } : null,
     quoteTerms: input.kind === 'quote' ? input.quoteTerms ?? null : null,
     invoiceTerms: isInvoice
-      ? {
+      ? paymentTerms(input.profile, input.client, {
           serviceDate: input.invoiceDates?.serviceDate ?? null,
           dueDate: input.invoiceDates?.dueDate ?? null,
-          latePenaltyText: input.profile.latePenaltyText,
-          recoveryIndemnity: input.client?.type === 'business' ? RECOVERY_INDEMNITY_MENTION : null,
-          discount: NO_DISCOUNT_MENTION,
-          paymentDetails: input.profile.paymentDetails,
           notes: input.invoiceDates?.notes ?? '',
-        }
+        })
       : null,
     references: { quote: input.quoteRef ?? null, creditedInvoice: null },
   };
 }
 
-/** Avoir total : reprend les lignes et déductions de la facture annulée, en négatif. */
+/**
+ * Avoir total : reprend les lignes et déductions de la facture annulée, en négatif.
+ * Il porte les mentions de paiement (profil et client actuels) et la date de prestation de la facture annulée, sans échéance.
+ */
 export function buildCreditView(original: DocumentView, ctx: CreditContext): DocumentView {
   const lines = original.lines.map((l) => ({ ...l, unitPriceCents: -l.unitPriceCents }));
   const totals = computeTotals(lines);
@@ -163,7 +179,7 @@ export function buildCreditView(original: DocumentView, ctx: CreditContext): Doc
     dueLabel: 'Montant de l’avoir',
     deductions,
     quoteTerms: null,
-    invoiceTerms: null,
+    invoiceTerms: paymentTerms(ctx.profile, ctx.client, { serviceDate: original.invoiceTerms?.serviceDate ?? null, dueDate: null, notes: '' }),
     references: { quote: original.references.quote, creditedInvoice: ctx.creditedRef },
   };
 }

@@ -2,6 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { buildCreditView, buildDocumentView, type BuildViewInput } from '../../shared/document';
+import { NO_DISCOUNT_MENTION, RECOVERY_INDEMNITY_MENTION } from '../../shared/legal';
 import { CLIENT_BUSINESS_DATA, CLIENT_INDIVIDUAL_DATA, MOCKUP_LINES, PROFILE_DATA } from '../../shared/test-fixtures';
 import { getTemplate } from '../../templates/registry';
 import { DocumentRenderer } from './DocumentRenderer';
@@ -86,5 +87,20 @@ describe('DocumentRenderer', () => {
     expect(text()).toContain('Annule la facture n° F-2026-025 du 15 octobre 2026');
     expect(text()).toContain('Montant de l’avoir');
     expect(text()).toContain('-2 920,00 €');
+  });
+
+  it('porte sur l’avoir les mentions de paiement et la date de prestation d’origine, sans échéance', () => {
+    const credit = (original: ReturnType<typeof invoice>) => ({ ...buildCreditView(original, { date: '2026-11-03', templateRef: 'modele-01@1', profile: PROFILE_DATA, client: CLIENT_BUSINESS_DATA, creditedRef: { number: 'F-2026-025', date: '2026-10-15' } }), number: 'A-2026-001' });
+    const { unmount } = show(credit({ ...invoice(), number: 'F-2026-025' }));
+    for (const t of ['Date de la prestation : 14 octobre 2026', `Règlement : ${PROFILE_DATA.paymentDetails}`, PROFILE_DATA.latePenaltyText,
+      RECOVERY_INDEMNITY_MENTION, NO_DISCOUNT_MENTION]) {
+      expect(text()).toContain(plain(t));
+    }
+    expect(text()).not.toContain('Échéance');
+    unmount();
+
+    show(credit({ ...invoice(), number: 'F-2026-025', invoiceTerms: null }));
+    expect(text()).not.toContain('Date de la prestation');
+    expect(text()).not.toContain('Échéance');
   });
 });
