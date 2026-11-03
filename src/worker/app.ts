@@ -4,6 +4,7 @@ import { onError } from './errors';
 import { requireUser, sameOrigin } from './middleware';
 import { adminRoutes } from './routes/admin';
 import { meRoutes } from './routes/me';
+import { profileRoutes } from './routes/profile';
 import type { AppDeps, AppEnv } from './types';
 
 export function createApp(deps: AppDeps) {
@@ -21,6 +22,7 @@ export function createApp(deps: AppDeps) {
   const api = new Hono<AppEnv>();
   api.use('*', sameOrigin, requireUser);
   api.route('/', meRoutes);
+  api.route('/', profileRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);
