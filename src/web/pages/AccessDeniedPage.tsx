@@ -19,6 +19,7 @@ export function AccessDeniedPage() {
   if (kind === 'invitation') {
     // Ferme la session refusée et oublie son erreur en cache, sinon l’accueil renverrait aussitôt ici.
     const goHome = async (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // nouvel onglet : laisser faire le navigateur
       e.preventDefault();
       await authClient.signOut().catch(() => {});
       qc.clear();

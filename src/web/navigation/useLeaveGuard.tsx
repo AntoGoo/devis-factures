@@ -87,7 +87,8 @@ export function useLeaveGuard(opts: GuardOptions): { prompt: ReactNode; bypass: 
     guards.push(guard);
     notify();
     return () => {
-      guards.splice(guards.indexOf(guard), 1);
+      const i = guards.indexOf(guard);
+      if (i >= 0) guards.splice(i, 1);
       notify();
     };
   }, []);
