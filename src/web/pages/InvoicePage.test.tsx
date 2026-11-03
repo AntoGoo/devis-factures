@@ -75,3 +75,24 @@ it('bloque l’émission tant qu’une ligne est invalide, avec une indication, 
   // Le bouton « Supprimer le brouillon » n’est pas concerné par la validité du formulaire.
   expect(screen.getByRole('button', { name: 'Supprimer le brouillon' })).toBeEnabled();
 });
+
+it('affiche le refus de l’émission dans la boîte de confirmation, et l’efface à la réouverture', async () => {
+  stubApi();
+  const base = vi.mocked(fetch).getMockImplementation()!;
+  const message = 'Complétez l’adresse de facturation du client (rue, code postal, ville) avant d’émettre la facture.';
+  vi.mocked(fetch).mockImplementation(async (url, init) => (url === '/api/invoices/i1/issue'
+    ? Response.json({ error: 'client_address_required', message }, { status: 409 })
+    : base(url, init)));
+  renderPage();
+  const user = userEvent.setup();
+
+  await user.click(await screen.findByRole('button', { name: 'Émettre la facture' }));
+  let dialog = screen.getByRole('dialog', { name: 'Émettre la facture' });
+  await user.click(within(dialog).getByRole('button', { name: 'Émettre la facture' }));
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent(message);
+
+  await user.click(within(dialog).getByRole('button', { name: 'Annuler' }));
+  await user.click(screen.getByRole('button', { name: 'Émettre la facture' }));
+  dialog = screen.getByRole('dialog', { name: 'Émettre la facture' });
+  expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
+});

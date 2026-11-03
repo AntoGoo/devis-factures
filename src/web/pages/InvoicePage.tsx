@@ -48,6 +48,10 @@ export function InvoicePage() {
     },
   });
 
+  const openDialog = (d: 'issue' | 'pay' | 'credit') => { act.reset(); setDialog(d); };
+  // Un refus du serveur s’affiche dans la boîte ouverte (sinon il resterait caché derrière elle).
+  const dialogError = act.error && <p className="notice notice-error" role="alert">{act.error.message}</p>;
+
   if (res.isPending) return <p className="page-intro">Chargement…</p>;
   if (res.error) return <p className="notice notice-error" role="alert">{res.error.message}</p>;
   const { invoice: inv, view, links } = res.data;
@@ -70,7 +74,7 @@ export function InvoicePage() {
             const label = { issue: 'Émettre la facture', delete: 'Supprimer le brouillon', pay: 'Marquer payée', unpay: 'Annuler le paiement', credit: 'Créer un avoir' }[a];
             const disabled = act.isPending || (a === 'issue' && !payloadValid);
             const onClick = () => {
-              if (a === 'issue' || a === 'pay' || a === 'credit') return setDialog(a);
+              if (a === 'issue' || a === 'pay' || a === 'credit') return openDialog(a);
               if (a === 'delete' && !window.confirm('Supprimer ce brouillon ?')) return;
               act.mutate({ action: a, flush });
             };
@@ -88,7 +92,7 @@ export function InvoicePage() {
 
   const notices = (
     <>
-      {act.error && <p className="notice notice-error" role="alert">{act.error.message}</p>}
+      {dialog === null && dialogError}
       {links.quote && <p className="notice">Issue du devis <Link to={`/devis/${links.quote.id}`}>{links.quote.number}</Link>{inv.kind !== 'standalone' && <> · <Link to={`/devis/${links.quote.id}/facturation`}>suivi de la facturation</Link></>}</p>}
       {links.creditNote && <p className="notice notice-error">Annulée par l’avoir <Link to={`/factures/${links.creditNote.id}`}>{links.creditNote.number}</Link>.</p>}
       {links.creditedInvoice && <p className="notice">Avoir de la facture <Link to={`/factures/${links.creditedInvoice.id}`}>{links.creditedInvoice.number}</Link>.</p>}
@@ -116,6 +120,7 @@ export function InvoicePage() {
               <Dialog open={dialog === 'issue'} title="Émettre la facture" onClose={() => setDialog(null)}>
                 <p className="page-intro">Une fois émise, la facture reçoit son numéro définitif et ne peut plus être modifiée ni supprimée. Une erreur se corrige ensuite par un avoir.</p>
                 {!payloadValid && <p className="field-hint" role="status">Corrigez les champs en rouge avant de continuer.</p>}
+                {dialogError}
                 <div className="actions" style={{ justifyContent: 'flex-end' }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setDialog(null)}>Annuler</button>
                   <button type="button" className="btn btn-primary" disabled={act.isPending || !payloadValid} onClick={() => act.mutate({ action: 'issue', flush })}>Émettre la facture</button>
@@ -133,6 +138,7 @@ export function InvoicePage() {
       )}
       <Dialog open={dialog === 'pay'} title="Marquer la facture payée" onClose={() => setDialog(null)}>
         <label className="field">Date du paiement<input className="input" type="date" value={paidAt} onChange={(e) => setPaidAt(e.target.value)} /></label>
+        {dialogError}
         <div className="actions" style={{ justifyContent: 'flex-end' }}>
           <button type="button" className="btn btn-secondary" onClick={() => setDialog(null)}>Annuler</button>
           <button type="button" className="btn btn-primary" disabled={act.isPending} onClick={() => act.mutate({ action: 'pay' })}>Enregistrer le paiement</button>
@@ -140,6 +146,7 @@ export function InvoicePage() {
       </Dialog>
       <Dialog open={dialog === 'credit'} title="Créer un avoir" onClose={() => setDialog(null)}>
         <p className="page-intro">L’avoir annule entièrement la facture {inv.number}. Il reçoit son propre numéro et ne peut pas être supprimé. Vous pourrez ensuite émettre une facture corrigée.</p>
+        {dialogError}
         <div className="actions" style={{ justifyContent: 'flex-end' }}>
           <button type="button" className="btn btn-secondary" onClick={() => setDialog(null)}>Annuler</button>
           <button type="button" className="btn btn-primary" disabled={act.isPending} onClick={() => act.mutate({ action: 'credit' })}>Créer l’avoir</button>
