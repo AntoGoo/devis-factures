@@ -40,7 +40,8 @@
 
 @page { size: A4; margin: 12mm 14mm; }
 @media print {
-  body, .print-page { background: #FFFFFF; padding: 0; }
+  /* `html body` : plus spécifique que la règle `body` de base.css, quel que soit l’ordre de chargement des feuilles. */
+  html body, .print-page { background: #FFFFFF; padding: 0; min-height: 0; }
   .no-print { display: none !important; }
   .doc-sheet { width: auto; min-height: 0; box-shadow: none; display: block; }
   .doc { padding: 0; }
