@@ -96,3 +96,9 @@ it('affiche le refus de l’émission dans la boîte de confirmation, et l’eff
   dialog = screen.getByRole('dialog', { name: 'Émettre la facture' });
   expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
 });
+
+it('indique le type de chaque client dans la liste, comme sur un devis', async () => {
+  stubApi();
+  renderPage();
+  expect(await screen.findByRole('option', { name: 'SCI Les Tilleuls (professionnel)' })).toBeInTheDocument();
+});

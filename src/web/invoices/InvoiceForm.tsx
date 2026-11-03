@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
 import type { InvoiceResponse } from '../../shared/api-types';
 import { computeBalance } from '../../shared/balance';
-import type { ClientData } from '../../shared/client';
+import { CLIENT_TYPE_LABEL, type ClientData } from '../../shared/client';
 import { EDITABLE_FIELDS } from '../../shared/invoice';
 import type { Totals } from '../../shared/lines';
 import { api } from '../api';
@@ -47,7 +47,7 @@ export function InvoiceForm({ initial, units, children }: {
             <label className="field">Client
               <select className="input" value={form.clientId ?? ''} onChange={(e) => (e.target.value === '__new__' ? setCreatingClient(true) : set('clientId', e.target.value || null))}>
                 <option value="">Choisir un client…</option>
-                {clients.data?.items.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {clients.data?.items.map((c) => <option key={c.id} value={c.id}>{c.name} ({CLIENT_TYPE_LABEL[c.type]})</option>)}
                 <option value="__new__">+ Nouveau client…</option>
               </select>
             </label>
