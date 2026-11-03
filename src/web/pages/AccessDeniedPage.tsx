@@ -36,7 +36,7 @@ export function AccessDeniedPage() {
             <h2>{cancelled ? 'Connexion annulée' : 'La connexion n’a pas abouti'}</h2>
             <p>
               {cancelled
-                ? 'Connexion annulée.'
+                ? 'Vous avez annulé la connexion avec Google.'
                 : 'La connexion avec Google a échoué pour une raison technique. Réessayez ; si le problème persiste, contactez l’administrateur.'}
             </p>
             {!cancelled && code && <p className="access-denied-code">Code : {code}</p>}

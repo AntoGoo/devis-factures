@@ -43,6 +43,7 @@ describe('AccessDeniedPage', () => {
   it('affiche une annulation pour ?error=access_denied', async () => {
     renderAt(403, { error: 'not_invited', message: '' }, '/acces-refuse?error=access_denied');
     expect(await screen.findByRole('heading', { name: 'Connexion annulée' })).toBeInTheDocument();
+    expect(screen.getByText('Vous avez annulé la connexion avec Google.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Réessayer' })).toBeInTheDocument();
   });
 
