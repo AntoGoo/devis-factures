@@ -5,6 +5,7 @@ import { requireUser, sameOrigin } from './middleware';
 import { adminRoutes } from './routes/admin';
 import { clientRoutes } from './routes/clients';
 import { meRoutes } from './routes/me';
+import { presetRoutes } from './routes/presets';
 import { profileRoutes } from './routes/profile';
 import type { AppDeps, AppEnv } from './types';
 
@@ -25,6 +26,7 @@ export function createApp(deps: AppDeps) {
   api.route('/', meRoutes);
   api.route('/', profileRoutes);
   api.route('/clients', clientRoutes);
+  api.route('/presets', presetRoutes);
   api.route('/admin', adminRoutes);
 
   app.route('/api', api);
