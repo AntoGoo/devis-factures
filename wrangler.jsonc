@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "devis-factures",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "f08e4be6-30ba-4b39-a244-3daec0ba5e11",
       "migrations_dir": "migrations"
     }
   ],
