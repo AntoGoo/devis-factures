@@ -11,6 +11,7 @@ import { DocumentToolbar } from '../components/DocumentToolbar';
 import { draftFromLine, draftsToLines, liveTotals, type DraftLine } from '../lines/lineDrafts';
 import { LinesEditor } from '../lines/LinesEditor';
 import { useAutosave } from '../lines/useAutosave';
+import { useLeaveGuard } from '../navigation/useLeaveGuard';
 
 type FormState = {
   clientId: string | null; object: string; interventionAddress: string; drafts: DraftLine[];
@@ -54,6 +55,14 @@ export function QuoteForm({ initial, units, templateName, onSaved, children }: {
     qc.setQueryData(['quote', initial.quote.id], r);
     onSaved(r);
   }, { enabled: payload !== null });
+  // Quitter la page : une modification valide est enregistrée d’abord ; confirmation si invalide ou en échec.
+  const { prompt } = useLeaveGuard({
+    dirty: autosave.unsaved || autosave.state === 'pending' || autosave.state === 'saving' || autosave.state === 'error',
+    trySave: async () => {
+      if (payload === null) return false;
+      try { await autosave.flush(); return true; } catch { return false; }
+    },
+  });
   const totals = liveTotals(form.drafts);
   const depositBp = parsePercent(form.plannedDeposit);
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -112,6 +121,7 @@ export function QuoteForm({ initial, units, templateName, onSaved, children }: {
           </div>
         </aside>
       </div>
+      {prompt}
       <ClientFormDialog open={creatingClient} onClose={() => setCreatingClient(false)} onSaved={(c) => { set('clientId', c.id); setCreatingClient(false); }} />
     </>
   );

@@ -10,6 +10,7 @@ import { ClientFormDialog } from '../components/ClientFormDialog';
 import { liveTotals } from '../lines/lineDrafts';
 import { LinesEditor } from '../lines/LinesEditor';
 import { useAutosave } from '../lines/useAutosave';
+import { useLeaveGuard } from '../navigation/useLeaveGuard';
 import { initialInvoiceForm, invoicePayload, type InvoiceFormState } from './invoiceForm';
 
 export function InvoiceForm({ initial, units, children }: {
@@ -28,6 +29,14 @@ export function InvoiceForm({ initial, units, children }: {
     if (!p) return;
     qc.setQueryData(['invoice', inv.id], await api<InvoiceResponse>('PUT', `/api/invoices/${inv.id}`, p));
   }, { enabled: payload !== null });
+  // Quitter la page : une modification valide est enregistrée d’abord ; confirmation si invalide ou en échec.
+  const { prompt } = useLeaveGuard({
+    dirty: autosave.unsaved || autosave.state === 'pending' || autosave.state === 'saving' || autosave.state === 'error',
+    trySave: async () => {
+      if (payload === null) return false;
+      try { await autosave.flush(); return true; } catch { return false; }
+    },
+  });
   const set = <K extends keyof InvoiceFormState>(k: K, v: InvoiceFormState[K]) => setForm((f) => ({ ...f, [k]: v }));
   const saveState = { idle: '', pending: 'Modifications en attente…', saving: 'Enregistrement…', saved: 'Enregistré', error: `Échec de l’enregistrement : ${autosave.error?.message ?? ''}` }[autosave.state];
 
@@ -65,6 +74,7 @@ export function InvoiceForm({ initial, units, children }: {
         </label>
         <label className="field span-all">Mentions complémentaires<textarea className="input" rows={2} value={form.notes} onChange={(e) => set('notes', e.target.value)} /></label>
       </section>
+      {prompt}
       <ClientFormDialog open={creatingClient} onClose={() => setCreatingClient(false)} onSaved={(c) => { set('clientId', c.id); setCreatingClient(false); }} />
     </>
   );

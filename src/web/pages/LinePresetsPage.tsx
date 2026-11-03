@@ -4,6 +4,7 @@ import { formatCentsForInput, formatEuros, parseEuros } from '../../shared/money
 import type { PresetData } from '../../shared/preset';
 import { DEFAULT_UNITS } from '../../shared/profile';
 import { api } from '../api';
+import { useLeaveGuard } from '../navigation/useLeaveGuard';
 import { useProfile } from '../profile/useProfile';
 
 export function LinePresetsPage() {
@@ -14,8 +15,18 @@ export function LinePresetsPage() {
   const [designation, setDesignation] = useState('');
   const [unit, setUnit] = useState(units[0] ?? 'u');
   const [price, setPrice] = useState('');
+  // Valeurs de la ligne type ouverte en modification (null : saisie d’une nouvelle ligne).
+  const [original, setOriginal] = useState<{ designation: string; unit: string; price: string } | null>(null);
   const cents = parseEuros(price === '' ? '0' : price);
-  const reset = () => { setEditingId(null); setDesignation(''); setPrice(''); };
+  const reset = () => { setEditingId(null); setOriginal(null); setDesignation(''); setPrice(''); };
+  const edit = (p: PresetData) => {
+    const values = { designation: p.designation, unit: p.unit, price: formatCentsForInput(p.unitPriceCents) };
+    setEditingId(p.id); setOriginal(values); setDesignation(values.designation); setUnit(values.unit); setPrice(values.price);
+  };
+  const dirty = original
+    ? designation !== original.designation || unit !== original.unit || price !== original.price
+    : designation.trim() !== '' || price.trim() !== '';
+  const { prompt } = useLeaveGuard({ dirty });
   const save = useMutation({
     mutationFn: () => {
       const body = { designation, unit, unitPriceCents: cents!, vatRate: null };
@@ -50,7 +61,7 @@ export function LinePresetsPage() {
               <tr key={p.id}>
                 <td>{p.designation}</td><td>{p.unit}</td><td className="num">{formatEuros(p.unitPriceCents)}</td>
                 <td className="actions" style={{ justifyContent: 'flex-end' }}>
-                  <button type="button" className="btn btn-secondary" style={{ height: 36 }} onClick={() => { setEditingId(p.id); setDesignation(p.designation); setUnit(p.unit); setPrice(formatCentsForInput(p.unitPriceCents)); }}>Modifier</button>
+                  <button type="button" className="btn btn-secondary" style={{ height: 36 }} onClick={() => edit(p)}>Modifier</button>
                   <button type="button" className="btn btn-danger" onClick={() => remove.mutate(p.id)}>Supprimer</button>
                 </td>
               </tr>
@@ -58,6 +69,7 @@ export function LinePresetsPage() {
           </tbody>
         </table>
       </div>
+      {prompt}
     </div>
   );
 }

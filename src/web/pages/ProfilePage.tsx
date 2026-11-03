@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { DEFAULT_UNITS, type ProfileData } from '../../shared/profile';
 import { ApiError, api } from '../api';
 import { OnboardingLayout } from '../layout/OnboardingLayout';
+import { useLeaveGuard } from '../navigation/useLeaveGuard';
 import { fileToLogoDataUrl } from '../profile/logo';
 import { useNumbering, useProfile } from '../profile/useProfile';
 
@@ -43,16 +44,24 @@ export function ProfilePage({ mode }: { mode: 'onboarding' | 'settings' }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [form, setForm] = useState<Form>(toForm(null));
+  const [saved, setSaved] = useState<Form>(form); // dernières valeurs chargées ou enregistrées
   const [logoError, setLogoError] = useState<string | null>(null);
   const [starts, setStarts] = useState<Record<string, string>>({});
 
-  useEffect(() => { if (profile.data) setForm(toForm(profile.data.profile)); }, [profile.data]);
+  useEffect(() => {
+    if (!profile.data) return;
+    const loaded = toForm(profile.data.profile);
+    setForm(loaded);
+    setSaved(loaded);
+  }, [profile.data]);
+  const { prompt, bypass } = useLeaveGuard({ dirty: JSON.stringify(form) !== JSON.stringify(saved) });
 
   const save = useMutation({
-    mutationFn: () => api('PUT', '/api/profile', toPayload(form)),
-    onSuccess: async () => {
+    mutationFn: (f: Form) => api('PUT', '/api/profile', toPayload(f)),
+    onSuccess: async (_, f) => {
+      setSaved(f);
       await Promise.all(['me', 'profile', 'numbering'].map((k) => qc.invalidateQueries({ queryKey: [k] })));
-      if (mode === 'onboarding') navigate('/');
+      if (mode === 'onboarding') { bypass(); navigate('/'); }
     },
   });
   const setStart = useMutation({
@@ -75,7 +84,7 @@ export function ProfilePage({ mode }: { mode: 'onboarding' | 'settings' }) {
     try { setLogoError(null); setForm({ ...form, logoDataUrl: await fileToLogoDataUrl(file) }); }
     catch (e) { setLogoError((e as Error).message); }
   };
-  const submit = (e: FormEvent) => { e.preventDefault(); save.mutate(); };
+  const submit = (e: FormEvent) => { e.preventDefault(); save.mutate(form); };
 
   const content = (
     <form className="page" style={{ maxWidth: 980, gap: 22 }} onSubmit={submit}>
@@ -161,6 +170,7 @@ export function ProfilePage({ mode }: { mode: 'onboarding' | 'settings' }) {
         {mode === 'settings' && <Link className="btn btn-secondary" to="/profil/modele">Changer de modèle</Link>}
         <button type="submit" className="btn btn-primary" disabled={save.isPending}>Enregistrer</button>
       </div>
+      {prompt}
     </form>
   );
   return mode === 'onboarding' ? <OnboardingLayout step={2}>{content}</OnboardingLayout> : content;

@@ -74,3 +74,19 @@ describe('useAutosave', () => {
     expect(result.current.state).toBe('saved');
   });
 });
+
+describe('useAutosave — unsaved', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('signale une valeur différente de la dernière enregistrée, y compris quand l’enregistrement est désactivé', async () => {
+    const save = vi.fn(async () => {});
+    const { rerender, result } = renderHook(({ v, enabled }) => useAutosave(v, save, { enabled }), { initialProps: { v: { a: 1 } as { a: number } | null, enabled: true } });
+    expect(result.current.unsaved).toBe(false);
+    rerender({ v: null, enabled: false });
+    expect(result.current.unsaved).toBe(true);
+    rerender({ v: { a: 2 }, enabled: true });
+    await act(() => result.current.flush());
+    expect(result.current.unsaved).toBe(false);
+  });
+});

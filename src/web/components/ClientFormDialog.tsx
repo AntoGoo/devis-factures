@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
 import type { ClientData, ClientInput } from '../../shared/client';
 import { ApiError, api } from '../api';
+import { useLeaveGuard } from '../navigation/useLeaveGuard';
 import { Dialog } from './Dialog';
 
 const EMPTY: ClientInput = { type: 'individual', name: '', street: '', postalCode: '', city: '', country: 'FR', siren: '', email: '', phone: '' };
@@ -10,6 +11,8 @@ export function ClientFormDialog({ open, initial, onClose, onSaved }: { open: bo
   const qc = useQueryClient();
   const [form, setForm] = useState<ClientInput>(initial ?? EMPTY);
   useEffect(() => { if (open) setForm(initial ?? EMPTY); }, [open, initial]);
+  // Seul le fait de quitter la page est retenu ; fermer la fenêtre (×, Échap, Annuler) reste libre.
+  const { prompt } = useLeaveGuard({ dirty: open && JSON.stringify(form) !== JSON.stringify(initial ?? EMPTY) });
   const save = useMutation({
     mutationFn: () => (initial ? api<ClientData>('PUT', `/api/clients/${initial.id}`, form) : api<ClientData>('POST', '/api/clients', form)),
     onSuccess: (c) => { qc.invalidateQueries({ queryKey: ['clients'] }); onSaved(c); },
@@ -24,26 +27,29 @@ export function ClientFormDialog({ open, initial, onClose, onSaved }: { open: bo
   );
   const submit = (e: FormEvent) => { e.preventDefault(); save.mutate(); };
   return (
-    <Dialog open={open} title={initial ? 'Modifier le client' : 'Nouveau client'} onClose={onClose}>
-      <form className="form-grid" onSubmit={submit}>
-        <fieldset className="span-all" style={{ border: 'none', padding: 0, margin: 0, display: 'flex', gap: 16 }}>
-          <legend className="field" style={{ marginBottom: 6 }}>Type de client</legend>
-          <label><input type="radio" name="type" checked={form.type === 'individual'} onChange={() => setForm({ ...form, type: 'individual', siren: '' })} /> Particulier</label>
-          <label><input type="radio" name="type" checked={form.type === 'business'} onChange={() => setForm({ ...form, type: 'business' })} /> Professionnel</label>
-        </fieldset>
-        {input('name', 'Nom ou raison sociale', true)}
-        {input('street', 'Adresse de facturation', true)}
-        {input('postalCode', 'Code postal')}
-        {input('city', 'Ville')}
-        {form.type === 'business' && input('siren', 'SIREN ou SIRET')}
-        {input('email', 'E-mail')}
-        {input('phone', 'Téléphone')}
-        {save.error && issues.length === 0 && <p className="field-error span-all" role="alert">{save.error.message}</p>}
-        <div className="actions span-all" style={{ justifyContent: 'flex-end' }}>
-          <button type="button" className="btn btn-secondary" onClick={onClose}>Annuler</button>
-          <button type="submit" className="btn btn-primary" disabled={save.isPending}>Enregistrer le client</button>
-        </div>
-      </form>
-    </Dialog>
+    <>
+      {prompt}
+      <Dialog open={open} title={initial ? 'Modifier le client' : 'Nouveau client'} onClose={onClose}>
+        <form className="form-grid" onSubmit={submit}>
+          <fieldset className="span-all" style={{ border: 'none', padding: 0, margin: 0, display: 'flex', gap: 16 }}>
+            <legend className="field" style={{ marginBottom: 6 }}>Type de client</legend>
+            <label><input type="radio" name="type" checked={form.type === 'individual'} onChange={() => setForm({ ...form, type: 'individual', siren: '' })} /> Particulier</label>
+            <label><input type="radio" name="type" checked={form.type === 'business'} onChange={() => setForm({ ...form, type: 'business' })} /> Professionnel</label>
+          </fieldset>
+          {input('name', 'Nom ou raison sociale', true)}
+          {input('street', 'Adresse de facturation', true)}
+          {input('postalCode', 'Code postal')}
+          {input('city', 'Ville')}
+          {form.type === 'business' && input('siren', 'SIREN ou SIRET')}
+          {input('email', 'E-mail')}
+          {input('phone', 'Téléphone')}
+          {save.error && issues.length === 0 && <p className="field-error span-all" role="alert">{save.error.message}</p>}
+          <div className="actions span-all" style={{ justifyContent: 'flex-end' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Annuler</button>
+            <button type="submit" className="btn btn-primary" disabled={save.isPending}>Enregistrer le client</button>
+          </div>
+        </form>
+      </Dialog>
+    </>
   );
 }

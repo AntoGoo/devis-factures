@@ -1,14 +1,13 @@
 // @vitest-environment jsdom
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { InvoiceResponse } from '../../shared/api-types';
 import { buildDocumentView } from '../../shared/document';
 import { blankLines } from '../../shared/lines';
 import { formatEuros } from '../../shared/money';
 import { CLIENT_BUSINESS_DATA, PROFILE_DATA } from '../../shared/test-fixtures';
+import { renderWithRouter } from '../test-utils';
 import { InvoicePage } from './InvoicePage';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -38,14 +37,7 @@ function stubApi() {
 }
 
 function renderPage() {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <QueryClientProvider client={qc}>
-      <MemoryRouter initialEntries={['/factures/i1']}>
-        <Routes><Route path="/factures/:id" element={<InvoicePage />} /></Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
-  );
+  return renderWithRouter(<InvoicePage />, { path: '/factures/:id', initialEntries: ['/factures/i1'] });
 }
 
 it('bloque l’émission tant qu’une ligne est invalide, avec une indication, et met à jour le total HT en direct', async () => {

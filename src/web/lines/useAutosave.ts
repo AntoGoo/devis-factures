@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type SaveState = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
-/** Enregistre `value` 800 ms après la dernière modification ; `flush` force l'enregistrement et rejette si l'enregistrement échoue. */
+/** Enregistre `value` 800 ms après la dernière modification ; `flush` force l'enregistrement et rejette si l'enregistrement échoue.
+ *  `unsaved` : la valeur courante diffère de la dernière enregistrée (même quand l'enregistrement est désactivé). */
 export function useAutosave<T>(value: T, save: (v: T) => Promise<unknown>, { enabled, delay = 800 }: { enabled: boolean; delay?: number }) {
   const [state, setState] = useState<SaveState>('idle');
   const [error, setError] = useState<Error | null>(null);
@@ -51,5 +52,5 @@ export function useAutosave<T>(value: T, save: (v: T) => Promise<unknown>, { ena
   // Enregistre ce qui reste en attente quand l'utilisateur quitte la page ; l'erreur est déjà reflétée dans `state`/`error`.
   useEffect(() => () => { void flush().catch(() => {}); }, [flush]);
 
-  return { state, error, flush };
+  return { state, error, flush, unsaved: serialized !== lastSaved.current };
 }

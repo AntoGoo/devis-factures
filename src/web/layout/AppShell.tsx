@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router';
 import { authClient } from '../auth-client';
+import { allowNextNavigation } from '../navigation/useLeaveGuard';
 import { queryClient } from '../query';
 import { useMe } from '../session/useMe';
 import { Brand } from './Brand';
@@ -25,6 +26,7 @@ export function AppShell() {
   const logout = async () => {
     await authClient.signOut();
     queryClient.clear();
+    allowNextNavigation(); // session déjà fermée : rester sur la page n’aurait plus de sens
     navigate('/connexion');
   };
   return (

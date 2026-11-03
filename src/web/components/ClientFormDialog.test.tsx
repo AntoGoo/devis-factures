@@ -1,15 +1,14 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, expect, it, vi } from 'vitest';
+import { renderWithRouter } from '../test-utils';
 import { ClientFormDialog } from './ClientFormDialog';
 
 afterEach(() => vi.unstubAllGlobals());
 
 function setup(onSaved = vi.fn()) {
-  const qc = new QueryClient();
-  render(<QueryClientProvider client={qc}><ClientFormDialog open onClose={() => {}} onSaved={onSaved} /></QueryClientProvider>);
+  renderWithRouter(<ClientFormDialog open onClose={() => {}} onSaved={onSaved} />);
   return onSaved;
 }
 
@@ -26,4 +25,24 @@ it('crée le client et le renvoie', async () => {
   await userEvent.type(screen.getByLabelText('Nom ou raison sociale'), 'Mme Garnier');
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer le client' }));
   expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ id: 'c1' }));
+});
+
+it('demande confirmation avant de quitter la page quand la fenêtre ouverte a été modifiée', async () => {
+  const { router } = renderWithRouter([
+    { path: '/clients', element: <ClientFormDialog open onClose={() => {}} onSaved={() => {}} /> },
+    { path: '/ailleurs', element: <h1>Ailleurs</h1> },
+  ], { initialEntries: ['/clients'] });
+  await userEvent.type(screen.getByLabelText('Nom ou raison sociale'), 'Mme Garnier');
+  await act(() => router.navigate('/ailleurs'));
+  expect(await screen.findByRole('dialog', { name: 'Quitter la page ?' })).toBeInTheDocument();
+  expect(router.state.location.pathname).toBe('/clients');
+});
+
+it('ne retient pas la page quand la fenêtre est fermée', async () => {
+  const { router } = renderWithRouter([
+    { path: '/clients', element: <ClientFormDialog open={false} onClose={() => {}} onSaved={() => {}} /> },
+    { path: '/ailleurs', element: <h1>Ailleurs</h1> },
+  ], { initialEntries: ['/clients'] });
+  await act(() => router.navigate('/ailleurs'));
+  expect(await screen.findByRole('heading', { name: 'Ailleurs' })).toBeInTheDocument();
 });

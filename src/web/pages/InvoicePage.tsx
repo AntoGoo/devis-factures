@@ -15,6 +15,7 @@ import { DocumentRenderer } from '../document/DocumentRenderer';
 import { useTemplateFonts } from '../document/useTemplateFonts';
 import { InvoiceForm } from '../invoices/InvoiceForm';
 import { invoiceActions, type InvoiceAction } from '../invoices/invoiceForm';
+import { allowNextNavigation } from '../navigation/useLeaveGuard';
 import { useProfile } from '../profile/useProfile';
 
 export function InvoicePage() {
@@ -42,8 +43,9 @@ export function InvoicePage() {
       setDialog(null);
       qc.invalidateQueries({ queryKey: ['invoices'] });
       qc.invalidateQueries({ queryKey: ['billing'] });
-      if (action === 'delete') return navigate('/factures');
-      if (action === 'credit' && r) return navigate(`/factures/${(r as InvoiceResponse).invoice.id}`);
+      // Navigations voulues par l’action : pas de confirmation, même si le formulaire quitté est invalide.
+      if (action === 'delete') { allowNextNavigation(); return navigate('/factures'); }
+      if (action === 'credit' && r) { allowNextNavigation(); return navigate(`/factures/${(r as InvoiceResponse).invoice.id}`); }
       if (r) qc.setQueryData(['invoice', id], r);
     },
   });

@@ -9,6 +9,7 @@ import { DocumentToolbar } from '../components/DocumentToolbar';
 import { StatusBadge } from '../components/StatusBadge';
 import { DocumentRenderer } from '../document/DocumentRenderer';
 import { useTemplateFonts } from '../document/useTemplateFonts';
+import { allowNextNavigation } from '../navigation/useLeaveGuard';
 import { useProfile } from '../profile/useProfile';
 import { QuoteForm } from '../quotes/QuoteForm';
 import { quoteActions, type QuoteAction } from '../quotes/quoteActions';
@@ -32,8 +33,9 @@ export function QuoteEditorPage() {
     },
     onSuccess: (r, { action }) => {
       qc.invalidateQueries({ queryKey: ['quotes'] });
-      if (action === 'delete') return navigate('/devis');
-      if (action === 'duplicate' && r) return navigate(`/devis/${(r as QuoteResponse).quote.id}`);
+      // Navigations voulues par l’action : pas de confirmation, même si le formulaire quitté est invalide.
+      if (action === 'delete') { allowNextNavigation(); return navigate('/devis'); }
+      if (action === 'duplicate' && r) { allowNextNavigation(); return navigate(`/devis/${(r as QuoteResponse).quote.id}`); }
       if (r) qc.setQueryData(['quote', id], r);
     },
   });

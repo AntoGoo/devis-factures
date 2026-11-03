@@ -1,13 +1,12 @@
 // @vitest-environment jsdom
-import { render, screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { QuoteResponse } from '../../shared/api-types';
 import { buildDocumentView } from '../../shared/document';
 import { blankLines } from '../../shared/lines';
 import { CLIENT_BUSINESS_DATA, PROFILE_DATA } from '../../shared/test-fixtures';
+import { renderWithRouter } from '../test-utils';
 import { QuoteEditorPage } from './QuoteEditorPage';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -24,7 +23,7 @@ const quote: QuoteResponse = {
   }),
 };
 
-function stubApi() {
+function stubApi({ putStatus = 200 } = {}) {
   const puts: unknown[] = [];
   vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
     if (url === '/api/profile') return Response.json({ profile: PROFILE_DATA });
@@ -32,7 +31,7 @@ function stubApi() {
     if (url === '/api/quotes/q1' && (init?.method ?? 'GET') === 'GET') return Response.json(quote);
     if (url === '/api/quotes/q1' && init?.method === 'PUT') {
       puts.push(init.body ? JSON.parse(String(init.body)) : undefined);
-      return Response.json(quote);
+      return putStatus === 200 ? Response.json(quote) : Response.json({ error: 'internal', message: 'Panne' }, { status: putStatus });
     }
     return Response.json({});
   }));
@@ -40,14 +39,10 @@ function stubApi() {
 }
 
 function renderPage() {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  render(
-    <QueryClientProvider client={qc}>
-      <MemoryRouter initialEntries={['/devis/q1']}>
-        <Routes><Route path="/devis/:id" element={<QuoteEditorPage />} /></Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
-  );
+  return renderWithRouter([
+    { path: '/devis/:id', element: <QuoteEditorPage /> },
+    { path: '/devis', element: <h1>Liste des devis</h1> },
+  ], { initialEntries: ['/devis/q1'] });
 }
 
 it('bloque les actions de statut tant qu’un champ du devis est invalide, avec une indication', async () => {
@@ -73,4 +68,47 @@ it('propose un lien de retour vers la liste des devis', async () => {
   stubApi();
   renderPage();
   expect(await screen.findByRole('link', { name: '← Devis' })).toHaveAttribute('href', '/devis');
+});
+
+it('enregistre une modification valide avant de quitter, sans rien demander', async () => {
+  const puts = stubApi();
+  renderPage();
+  await userEvent.type(await screen.findByLabelText('Objet'), 'Cuisine');
+  await userEvent.click(screen.getByRole('link', { name: '← Devis' }));
+  expect(await screen.findByRole('heading', { name: 'Liste des devis' })).toBeInTheDocument();
+  expect(puts).toHaveLength(1);
+  expect(puts[0]).toMatchObject({ object: 'Cuisine' });
+  expect(screen.queryByRole('dialog', { name: 'Quitter la page ?' })).not.toBeInTheDocument();
+});
+
+it('demande confirmation avant de quitter quand l’enregistrement échoue', async () => {
+  const puts = stubApi({ putStatus: 500 });
+  const { router } = renderPage();
+  await userEvent.type(await screen.findByLabelText('Objet'), 'Cuisine');
+  await userEvent.click(screen.getByRole('link', { name: '← Devis' }));
+  expect(await screen.findByRole('dialog', { name: 'Quitter la page ?' })).toBeInTheDocument();
+  expect(puts.length).toBeGreaterThan(0);
+  expect(router.state.location.pathname).toBe('/devis/q1');
+});
+
+it('demande confirmation avant de quitter quand un champ est invalide', async () => {
+  const puts = stubApi();
+  renderPage();
+  await screen.findByRole('button', { name: 'Marquer comme envoyé' });
+  const price = within(screen.getAllByRole('row')[1]!).getByLabelText('Prix unitaire HT en euros');
+  await userEvent.type(price, '12,345');
+  await userEvent.click(screen.getByRole('link', { name: '← Devis' }));
+  expect(await screen.findByRole('dialog', { name: 'Quitter la page ?' })).toBeInTheDocument();
+  expect(puts).toHaveLength(0);
+});
+
+it('ne demande rien après la suppression du brouillon, même avec un champ invalide', async () => {
+  stubApi();
+  vi.stubGlobal('confirm', vi.fn(() => true));
+  renderPage();
+  await screen.findByRole('button', { name: 'Marquer comme envoyé' });
+  await userEvent.type(within(screen.getAllByRole('row')[1]!).getByLabelText('Prix unitaire HT en euros'), '12,345');
+  await userEvent.click(screen.getByRole('button', { name: 'Supprimer le brouillon' }));
+  expect(await screen.findByRole('heading', { name: 'Liste des devis' })).toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Quitter la page ?' })).not.toBeInTheDocument());
 });
