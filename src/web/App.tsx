@@ -4,6 +4,8 @@ import { AppShell } from './layout/AppShell';
 import { AccessDeniedPage } from './pages/AccessDeniedPage';
 import { AdminPage } from './pages/AdminPage';
 import { ClientsPage } from './pages/ClientsPage';
+import { InvoicePage } from './pages/InvoicePage';
+import { InvoicesListPage } from './pages/InvoicesListPage';
 import { LinePresetsPage } from './pages/LinePresetsPage';
 import { LoginPage } from './pages/LoginPage';
 import { PrintPage } from './pages/PrintPage';
@@ -32,6 +34,8 @@ export function App() {
               <Route path="devis" element={<QuotesListPage />} />
               <Route path="devis/:id" element={<QuoteEditorPage />} />
               <Route path="devis/:id/facturation" element={<QuoteBillingPage />} />
+              <Route path="factures" element={<InvoicesListPage />} />
+              <Route path="factures/:id" element={<InvoicePage />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="lignes-types" element={<LinePresetsPage />} />
               <Route path="profil" element={<ProfilePage mode="settings" />} />
