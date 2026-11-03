@@ -7,20 +7,21 @@
 .tpl-modele-03-v1-thumb .t-row { height: 6px; background: #F4EEE4; }
 .tpl-modele-03-v1-thumb .t-total { align-self: flex-end; width: 50%; height: 16px; border-top: 2px solid #6B2333; margin-top: auto; }
 
-.tpl-modele-03-v1 { font-family: 'Source Sans 3', sans-serif; color: #2A2224; background: #FFFDF9; gap: 20px; }
+.tpl-modele-03-v1 { font-family: 'Source Sans 3', sans-serif; color: #2A2224; background: #FFFDF9; gap: 12px; }
 .tpl-modele-03-v1 > * { order: 10; }
 .tpl-modele-03-v1 .doc-header { display: contents; }
-.tpl-modele-03-v1 .doc-brand { order: 1; align-self: center; flex-direction: column; gap: 6px; text-align: center; }
+.tpl-modele-03-v1 .doc-brand { order: 1; align-self: center; flex-direction: column; gap: 4px; text-align: center; }
+.tpl-modele-03-v1 .doc-logo { max-height: 44px; }
 .tpl-modele-03-v1 .doc-brand-text { align-items: center; }
 .tpl-modele-03-v1 .doc-trade-name { font-family: Fraunces, serif; font-weight: 600; font-size: 26px; color: #6B2333; }
 .tpl-modele-03-v1 .doc-activity { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A6A3E; }
 .tpl-modele-03-v1 .doc-rule { order: 2; border-top: 1px solid #B08D57; border-bottom: 1px solid #B08D57; height: 3px; }
 .tpl-modele-03-v1 .doc-heading { order: 3; flex-direction: row; justify-content: space-between; align-items: baseline; text-align: left; }
-.tpl-modele-03-v1 .doc-title { font-family: Fraunces, serif; font-weight: 500; font-size: 34px; letter-spacing: 0.06em; }
+.tpl-modele-03-v1 .doc-title { font-family: Fraunces, serif; font-weight: 500; font-size: 34px; line-height: 1.1; letter-spacing: 0.06em; }
 .tpl-modele-03-v1 .doc-meta { flex-direction: row; gap: 0; font-size: 14px; color: #6B5E60; }
 .tpl-modele-03-v1 .doc-meta .doc-date::before { content: ' · le '; white-space: pre; }
-.tpl-modele-03-v1 .doc-parties { gap: 20px; }
-.tpl-modele-03-v1 .doc-party { border: 1px solid #E8DCC8; padding: 14px 16px; }
+.tpl-modele-03-v1 .doc-parties { gap: 20px; line-height: 1.4; }
+.tpl-modele-03-v1 .doc-party { border: 1px solid #E8DCC8; padding: 10px 14px; }
 .tpl-modele-03-v1 .doc-label { font-family: Fraunces, serif; font-size: 14px; font-style: italic; font-weight: 500; color: #8A6A3E; }
 .tpl-modele-03-v1 .doc-object { display: flex; gap: 10px; align-items: baseline; }
 .tpl-modele-03-v1 .doc-object .doc-label { font-size: 15px; }
@@ -28,6 +29,7 @@
 .tpl-modele-03-v1 .doc-lines thead tr { border-bottom: 1px solid #6B2333; }
 .tpl-modele-03-v1 .doc-lines th { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B2333; font-weight: 700; padding: 8px 6px; }
 .tpl-modele-03-v1 .doc-lines tbody tr { border-bottom: 1px solid #EFE6D8; }
+.tpl-modele-03-v1 .doc-lines td { padding: 7px 6px; }
 .tpl-modele-03-v1 .doc-totals { width: 320px; }
 .tpl-modele-03-v1 .doc-vat, .tpl-modele-03-v1 .doc-reference { color: #6B5E60; font-style: italic; }
 .tpl-modele-03-v1 .doc-insurance { color: #6B5E60; }
@@ -36,6 +38,6 @@
 .tpl-modele-03-v1 .doc-total-due span:first-child { font-size: 17px; }
 .tpl-modele-03-v1 .doc-total-due span:last-child { font-size: 22px; }
 .tpl-modele-03-v1 .doc-footer-blocks { gap: 24px; }
-.tpl-modele-03-v1 .doc-footer-blocks .doc-label { font-style: normal; font-weight: 600; font-size: 15px; color: #6B2333; border-bottom: 1px solid #B08D57; padding-bottom: 4px; margin-bottom: 4px; }
+.tpl-modele-03-v1 .doc-footer-blocks .doc-label { font-style: normal; font-weight: 600; font-size: 15px; color: #6B2333; border-bottom: 1px solid #B08D57; padding-bottom: 3px; margin-bottom: 2px; }
 .tpl-modele-03-v1 .doc-signature { border: 1px solid #E8DCC8; }
 .tpl-modele-03-v1 .doc-thanks { font-family: Fraunces, serif; font-style: italic; font-size: 13px; color: #8A6A3E; }
