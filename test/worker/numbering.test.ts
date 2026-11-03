@@ -111,6 +111,19 @@ describe('numérotation', () => {
     expect(row).toEqual({ number: 'F-2026-001', status: 'issued', issue_date: '2026-11-03', snap: 'F-2026-001' });
   });
 
+  it('combine une condition paramétrée vraie avec des colonnes et un instantané (pas de régression d’ordre de liaison)', async () => {
+    const u = await createUser('a@example.test');
+    const id = await draft(u.id);
+    const result = await runIssue(env.DB, target(u.id, id, {
+      guard: { sql: 'AND d.total_ht_cents >= ?', params: [0] },
+      snapshotJson: JSON.stringify({ schemaVersion: 1, number: null }),
+    }));
+    expect(result).toEqual({ issued: true, number: 'F-2026-001' });
+    const row = await env.DB.prepare("SELECT number, status, json_extract(snapshot_json, '$.number') AS snap FROM invoices WHERE id = ?").bind(id).first();
+    expect(row).toEqual({ number: 'F-2026-001', status: 'issued', snap: 'F-2026-001' });
+    expect(await counter(u.id)).toBe(1);
+  });
+
   it('produit le même format que formatDocumentNumber', async () => {
     const u = await createUser('a@example.test');
     await env.DB.prepare("INSERT INTO counters (user_id, series, year, last_value) VALUES (?, 'F', 2026, 1233)").bind(u.id).run();

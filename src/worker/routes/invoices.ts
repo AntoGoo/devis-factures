@@ -1,17 +1,19 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 import type { InvoiceResponse } from '../../shared/api-types';
-import { todayInParis } from '../../shared/dates';
+import { computeBalance } from '../../shared/balance';
+import { addDays, todayInParis, yearOf } from '../../shared/dates';
 import { checkDeposit, depositAmountCents, DepositInputSchema } from '../../shared/deposits';
-import { parseSnapshot } from '../../shared/document';
+import { buildDocumentView, parseSnapshot } from '../../shared/document';
 import { EDITABLE_FIELDS, InvoiceDraftInput } from '../../shared/invoice';
-import { blankLines, computeTotals, type Line } from '../../shared/lines';
+import { blankLines, computeTotals, lineProblems, type Line } from '../../shared/lines';
 import { formatEuros, formatPercent } from '../../shared/money';
-import { requireClient } from '../db/clients';
-import { invoiceLinks, listInvoices, quoteBillingState, requireInvoiceRow, toInvoiceDto, type InvoiceRow } from '../db/invoices';
+import { getClient, requireClient } from '../db/clients';
+import { invoiceLinks, listInvoices, listIssuedDeposits, quoteBillingState, requireInvoiceRow, toInvoiceDto, type InvoiceRow } from '../db/invoices';
 import { requireCompleteProfile } from '../db/profiles';
-import { requireQuoteRow, type QuoteRow } from '../db/quotes';
+import { getQuoteRow, requireQuoteRow, type QuoteRow } from '../db/quotes';
 import { HttpError, validate } from '../errors';
+import { runIssue } from '../numbering';
 import type { AppContext, AppEnv } from '../types';
 import { invoiceView } from '../views';
 
@@ -144,6 +146,72 @@ export const invoiceRoutes = new Hono<AppEnv>()
     ).run();
     if (res.meta.changes === 0) throw notDraft();
     return respondInvoice(c, row.id);
+  })
+
+  .post('/invoices/:id/issue', async (c) => {
+    const { DB } = c.env;
+    const userId = c.var.user.id;
+    const inv = await requireInvoiceRow(DB, userId, c.req.param('id'));
+    if (inv.status !== 'draft' || inv.kind === 'credit') throw new HttpError(409, 'not_draft', 'Cette facture est déjà émise.');
+    const profile = await requireCompleteProfile(DB, userId);
+    const client = inv.client_id ? await getClient(DB, userId, inv.client_id) : null;
+    if (!client) throw new HttpError(409, 'client_missing', 'Choisissez un client avant d’émettre la facture.');
+    if (client.type === 'business' && !client.siren) {
+      throw new HttpError(409, 'client_siren_required', 'Ajoutez le SIREN de ce client professionnel avant d’émettre la facture.');
+    }
+    const lines = JSON.parse(inv.lines_json) as Line[];
+    const problems = lineProblems(lines);
+    if (problems.filledCount === 0) throw new HttpError(409, 'no_lines', 'Ajoutez au moins une ligne remplie.');
+    if (problems.missingDesignation.length > 0) {
+      throw new HttpError(409, 'missing_designation', `Chaque ligne chiffrée doit avoir une désignation (ligne ${problems.missingDesignation.join(', ')}).`);
+    }
+    if (computeTotals(lines).totalHtCents <= 0) throw new HttpError(409, 'non_positive_total', 'Le total de la facture doit être positif.');
+
+    const issueDate = today(c);
+    const serviceDate = inv.service_date ?? issueDate;
+    const dueDate = inv.due_date ?? addDays(issueDate, profile.defaultPaymentDelayDays);
+    if (dueDate < issueDate) throw new HttpError(409, 'due_before_issue', 'L’échéance ne peut pas précéder la date d’émission.');
+
+    const quote = inv.quote_id ? await getQuoteRow(DB, userId, inv.quote_id) : null;
+    let deducted: Awaited<ReturnType<typeof listIssuedDeposits>> = [];
+    let guard: { sql: string; params: (string | number | null)[] } | undefined;
+    if (inv.kind === 'final' && quote) {
+      if ((await quoteBillingState(DB, userId, quote.id)).draftDepositCount > 0) {
+        throw new HttpError(409, 'pending_deposit_draft', 'Émettez ou supprimez d’abord la facture d’acompte en brouillon.');
+      }
+      deducted = await listIssuedDeposits(DB, userId, quote.id);
+      if (computeBalance(computeTotals(lines).totalHtCents, deducted).remainingCents < 0) {
+        throw new HttpError(409, 'negative_remaining', 'Le total du solde est inférieur aux acomptes déjà facturés. Ajustez les lignes.');
+      }
+      // Rien n'a changé dans les acomptes entre la lecture et l'émission.
+      guard = {
+        sql: `AND NOT EXISTS (SELECT 1 FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'deposit' AND x.status = 'draft')
+              AND (SELECT COUNT(*) FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'deposit' AND x.status = 'issued') = ?`,
+        params: [deducted.length],
+      };
+    }
+    if (inv.kind === 'deposit') {
+      guard = { sql: `AND NOT EXISTS (SELECT 1 FROM invoices x WHERE x.quote_id = d.quote_id AND x.kind = 'final' AND x.status = 'issued')`, params: [] };
+    }
+
+    const view = buildDocumentView({
+      kind: inv.kind, number: null, date: issueDate, templateRef: profile.templateRef, profile, client,
+      object: inv.object, interventionAddress: inv.intervention_address, lines,
+      invoiceDates: { serviceDate, dueDate, notes: inv.notes },
+      deductedDeposits: inv.kind === 'final' ? deducted : undefined,
+      quoteRef: quote?.number && quote.quote_date ? { number: quote.number, date: quote.quote_date } : null,
+    });
+    const result = await runIssue(DB, {
+      table: 'invoices', docId: inv.id, userId, series: 'F', year: yearOf(issueDate), prefix: profile.prefixInvoice,
+      set: {
+        status: 'issued', issue_date: issueDate, service_date: serviceDate, due_date: dueDate,
+        total_ht_cents: view.totals.totalHtCents, amount_due_cents: view.totals.totalDueCents, updated_at: nowIso(c),
+      },
+      snapshotJson: JSON.stringify(view),
+      guard,
+    });
+    if (!result.issued) throw new HttpError(409, 'not_draft', 'Cette facture a changé entre-temps (déjà émise, ou acomptes modifiés). Rechargez la page.');
+    return respondInvoice(c, inv.id);
   })
 
   .delete('/invoices/:id', async (c) => {
