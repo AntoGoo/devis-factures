@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Navigate } from 'react-router';
 import { authClient } from '../auth-client';
 import { useMe } from '../session/useMe';
@@ -5,8 +6,23 @@ import './LoginPage.css';
 
 export function LoginPage() {
   const me = useMe();
+  const [pending, setPending] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
   if (me.data) return <Navigate to="/" replace />;
-  const signIn = () => authClient.signIn.social({ provider: 'google', callbackURL: '/', errorCallbackURL: '/acces-refuse' });
+  const signIn = async () => {
+    setPending(true);
+    setUnavailable(false);
+    try {
+      const result = await authClient.signIn.social({ provider: 'google', callbackURL: '/', errorCallbackURL: '/acces-refuse' });
+      if (result?.error) {
+        setUnavailable(true);
+        setPending(false);
+      }
+    } catch {
+      setUnavailable(true);
+      setPending(false);
+    }
+  };
   return (
     <main className="login">
       <section className="login-hero">
@@ -29,10 +45,15 @@ export function LoginPage() {
             <h2>Connexion</h2>
             <p>Utilisez le compte Google associé à votre activité.</p>
           </div>
-          <button type="button" className="google-button" onClick={signIn}>
+          <button type="button" className="google-button" onClick={signIn} disabled={pending}>
             <GoogleIcon />
             Continuer avec Google
           </button>
+          {unavailable && (
+            <p className="notice notice-error" role="alert">
+              La connexion Google est indisponible pour le moment. Réessayez plus tard ou contactez l’administrateur.
+            </p>
+          )}
           <div className="notice">
             <LockIcon />
             <p>Accès sur invitation. Si votre adresse n’a pas encore été autorisée, contactez l’administrateur.</p>

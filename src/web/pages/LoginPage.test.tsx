@@ -46,4 +46,31 @@ describe('LoginPage', () => {
     expect(await screen.findByText('Contenu protégé')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' })).not.toBeInTheDocument();
   });
+
+  it('affiche un message d’indisponibilité si Google renvoie une erreur', async () => {
+    social.mockResolvedValueOnce({ data: null, error: { message: 'oauth_failed' } });
+    renderAt(401, { error: 'unauthenticated', message: '' });
+    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    await userEvent.click(screen.getByRole('button', { name: /Continuer avec Google/ }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('La connexion Google est indisponible pour le moment. Réessayez plus tard ou contactez l’administrateur.');
+  });
+
+  it('affiche un message d’indisponibilité si l’appel Google lève une exception', async () => {
+    social.mockRejectedValueOnce(new Error('network down'));
+    renderAt(401, { error: 'unauthenticated', message: '' });
+    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    await userEvent.click(screen.getByRole('button', { name: /Continuer avec Google/ }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('La connexion Google est indisponible pour le moment. Réessayez plus tard ou contactez l’administrateur.');
+  });
+
+  it('désactive le bouton pendant l’appel de connexion', async () => {
+    let resolveSocial: (value: { data: null; error: null }) => void = () => {};
+    social.mockImplementationOnce(() => new Promise((resolve) => { resolveSocial = resolve; }));
+    renderAt(401, { error: 'unauthenticated', message: '' });
+    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    const button = screen.getByRole('button', { name: /Continuer avec Google/ });
+    await userEvent.click(button);
+    expect(button).toBeDisabled();
+    resolveSocial({ data: null, error: null });
+  });
 });
