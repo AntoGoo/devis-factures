@@ -64,7 +64,7 @@ export const dashboardRoutes = new Hono<AppEnv>().get(
     const k = collected!.results[0] as { n: number; total: number };
     const body: DashboardData = {
       today,
-      greetingName: ((profile?.ownerName || c.var.user.name).split(/\s+/)[0]) ?? '',
+      greetingName: (profile?.ownerName || c.var.user.name).split(/\s+/)[0],
       outstanding: { totalCents: o.total, lateCents: o.late },
       pendingQuotes: { count: p.n, totalCents: p.total },
       collectedThisMonth: { totalCents: k.total, count: k.n, monthLabel: MONTH.format(new Date(`${month.start}T00:00:00Z`)) },

@@ -23,6 +23,10 @@ describe('GET /api/dashboard', () => {
     await seedQuote(app, u, { clientId: client.id, lines: [line(453000)], status: 'sent' }); // 4 530,00 €
 
     const september = testApp(new Date('2026-09-01T10:00:00Z'));
+    // Payée ce mois, puis annulée par avoir : doit rester comptée dans « encaissé ce mois » et disparaître du « reste à encaisser ».
+    const paidThenCredited = await issuedInvoice(september, u, client.id, 45000);
+    await call(september, u, 'PUT', `/api/invoices/${paidThenCredited}/payment`, { paidAt: '2026-11-01' });
+    await call(september, u, 'POST', `/api/invoices/${paidThenCredited}/credit-note`);
     await issuedInvoice(september, u, client.id, 120000);                             // échéance 1er octobre : en retard
     await issuedInvoice(app, u, client.id, 366000);                                   // à payer
     const paidNow = await issuedInvoice(app, u, client.id, 72000);
@@ -38,14 +42,18 @@ describe('GET /api/dashboard', () => {
       greetingName: 'Karim',
       outstanding: { totalCents: 486000, lateCents: 120000 },
       pendingQuotes: { count: 2, totalCents: 745000 },
-      collectedThisMonth: { totalCents: 72000, count: 1, monthLabel: 'novembre' },
+      // 72 000 (paidNow) + 45 000 (paidThenCredited, encaissée ce mois malgré son annulation depuis) = 117 000.
+      collectedThisMonth: { totalCents: 117000, count: 2, monthLabel: 'novembre' },
     });
-    expect(d.recent).toHaveLength(9); // 3 devis + 5 factures + 1 avoir
+    expect(d.recent).toHaveLength(10); // 3 devis + 6 factures + 2 avoirs = 11 candidats, bornés à 10 (le plus ancien est écarté)
     expect(d.recent).toContainEqual(expect.objectContaining({ type: 'invoice', kindLabel: 'Avoir', status: { label: 'Avoir émis', tone: 'neutral' } }));
     expect(d.recent).toContainEqual(expect.objectContaining({ kindLabel: 'Facture', status: { label: 'En retard', tone: 'late' } }));
 
     const quotesOnly = await json(await call(app, u, 'GET', '/api/dashboard?filter=quotes'));
     expect(quotesOnly.recent.every((r: { type: string }) => r.type === 'quote')).toBe(true);
     expect(quotesOnly.recent.find((r: { number: string | null }) => r.number === null)).toMatchObject({ kindLabel: 'Devis (brouillon)', status: { label: 'Brouillon' } });
+
+    const invoicesOnly = await json(await call(app, u, 'GET', '/api/dashboard?filter=invoices'));
+    expect(invoicesOnly.recent.every((r: { type: string }) => r.type === 'invoice')).toBe(true);
   });
 });
