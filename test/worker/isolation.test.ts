@@ -65,4 +65,16 @@ describe('cloisonnement par utilisateur', () => {
     expect((await call(app, b, 'PUT', `/api/invoices/${own.invoice.id}`, { clientId: clientOfA.id, serviceDate: null, dueDate: null, notes: '' })).status).toBe(404);
     expect((await json(await call(app, b, 'GET', `/api/invoices/${own.invoice.id}`))).view.client).toBeNull();
   });
+
+  it('interdit de payer ou d’annuler la facture d’un autre utilisateur', async () => {
+    const { a, b } = await twoUsers(app);
+    const client = await seedClient(app, a);
+    const created = await json(await call(app, a, 'POST', '/api/invoices/standalone', { clientId: client.id }));
+    await call(app, a, 'PUT', `/api/invoices/${created.invoice.id}`, { lines: [{ id: 'l', designation: 'X', quantityMilli: 1000, unit: 'u', unitPriceCents: 100, vatRate: null }], serviceDate: null, dueDate: null, notes: '' });
+    expect((await call(app, b, 'POST', `/api/invoices/${created.invoice.id}/issue`)).status).toBe(404);
+    await call(app, a, 'POST', `/api/invoices/${created.invoice.id}/issue`);
+    expect((await call(app, b, 'PUT', `/api/invoices/${created.invoice.id}/payment`, { paidAt: '2026-11-03' })).status).toBe(404);
+    expect((await call(app, b, 'POST', `/api/invoices/${created.invoice.id}/credit-note`)).status).toBe(404);
+    expect((await json(await call(app, b, 'GET', '/api/numbering'))).series[2].next).toBe('A-2026-001');
+  });
 });

@@ -2,9 +2,9 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import type { InvoiceResponse } from '../../shared/api-types';
 import { computeBalance } from '../../shared/balance';
-import { addDays, todayInParis, yearOf } from '../../shared/dates';
+import { addDays, isIsoDate, todayInParis, yearOf } from '../../shared/dates';
 import { checkDeposit, depositAmountCents, DepositInputSchema } from '../../shared/deposits';
-import { buildDocumentView, parseSnapshot } from '../../shared/document';
+import { buildCreditView, buildDocumentView, parseSnapshot } from '../../shared/document';
 import { EDITABLE_FIELDS, InvoiceDraftInput } from '../../shared/invoice';
 import { blankLines, computeTotals, lineProblems, type Line } from '../../shared/lines';
 import { formatEuros, formatPercent } from '../../shared/money';
@@ -212,6 +212,65 @@ export const invoiceRoutes = new Hono<AppEnv>()
     });
     if (!result.issued) throw new HttpError(409, 'not_draft', 'Cette facture a changé entre-temps (déjà émise, ou acomptes modifiés). Rechargez la page.');
     return respondInvoice(c, inv.id);
+  })
+
+  .put('/invoices/:id/payment', validate('json', z.object({ paidAt: z.string().refine(isIsoDate).nullable() })), async (c) => {
+    const row = await requireInvoiceRow(c.env.DB, c.var.user.id, c.req.param('id'));
+    const notPayable = new HttpError(409, 'not_payable', 'Seule une facture émise et non annulée peut être marquée payée.');
+    if (row.status !== 'issued' || row.kind === 'credit') throw notPayable;
+    const { paidAt } = c.req.valid('json');
+    if (paidAt && row.issue_date && paidAt < row.issue_date) throw new HttpError(409, 'paid_before_issue', 'La date de paiement précède la date d’émission.');
+    const res = await c.env.DB.prepare(
+      "UPDATE invoices SET paid_at = ?, updated_at = ? WHERE id = ? AND user_id = ? AND status = 'issued' AND kind != 'credit'",
+    ).bind(paidAt, nowIso(c), row.id, c.var.user.id).run();
+    if (res.meta.changes === 0) throw notPayable;
+    return respondInvoice(c, row.id);
+  })
+
+  .post('/invoices/:id/credit-note', async (c) => {
+    const { DB } = c.env;
+    const userId = c.var.user.id;
+    const orig = await requireInvoiceRow(DB, userId, c.req.param('id'));
+    const notCreditable = new HttpError(409, 'not_creditable', 'Seule une facture émise et non annulée peut recevoir un avoir.');
+    if (orig.kind === 'credit' || orig.status !== 'issued' || !orig.snapshot_json || !orig.number || !orig.issue_date) throw notCreditable;
+    if (orig.kind === 'deposit' && orig.quote_id) {
+      const state = await quoteBillingState(DB, userId, orig.quote_id);
+      if (state.activeFinal?.status === 'issued') {
+        throw new HttpError(409, 'deposit_deducted', 'Cet acompte est déduit par la facture de solde : annulez d’abord le solde par un avoir.');
+      }
+    }
+    const profile = await requireCompleteProfile(DB, userId);
+    const client = orig.client_id ? await getClient(DB, userId, orig.client_id) : null;
+    const issueDate = today(c);
+    const view = buildCreditView(parseSnapshot(orig.snapshot_json), {
+      date: issueDate, templateRef: profile.templateRef, profile, client, creditedRef: { number: orig.number, date: orig.issue_date },
+    });
+    const creditId = crypto.randomUUID();
+    const now = nowIso(c);
+    const before = [
+      // 1. Annule la facture d'origine si elle est encore annulable, en la reliant à l'avoir.
+      DB.prepare(
+        `UPDATE invoices SET status = 'cancelled', cancelled_at = ?, credited_by_id = ?, updated_at = ?
+         WHERE id = ? AND user_id = ? AND status = 'issued' AND kind != 'credit'
+           AND NOT (kind = 'deposit' AND EXISTS (
+             SELECT 1 FROM invoices f WHERE f.quote_id = invoices.quote_id AND f.user_id = invoices.user_id AND f.kind = 'final' AND f.status = 'issued'
+           ))`,
+      ).bind(now, creditId, now, orig.id, userId),
+      // 2. Crée l'avoir en brouillon seulement si l'annulation ci-dessus a eu lieu.
+      DB.prepare(
+        `INSERT INTO invoices (id, user_id, kind, quote_id, credited_invoice_id, client_id, status, object, intervention_address, lines_json, total_ht_cents, amount_due_cents, created_at, updated_at)
+         SELECT ?, ?, 'credit', ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?
+         WHERE EXISTS (SELECT 1 FROM invoices WHERE id = ? AND user_id = ? AND credited_by_id = ?)`,
+      ).bind(creditId, userId, orig.quote_id, orig.id, orig.client_id, view.object, view.interventionAddress, JSON.stringify(view.lines),
+        view.totals.totalHtCents, view.totals.totalDueCents, now, now, orig.id, userId, creditId),
+    ];
+    // 3. Numérote l'avoir (série A) dans le même batch.
+    const result = await runIssue(DB, {
+      table: 'invoices', docId: creditId, userId, series: 'A', year: yearOf(issueDate), prefix: profile.prefixCredit,
+      set: { status: 'issued', issue_date: issueDate, updated_at: now }, snapshotJson: JSON.stringify(view),
+    }, { before });
+    if (!result.issued) throw notCreditable;
+    return respondInvoice(c, creditId, 201);
   })
 
   .delete('/invoices/:id', async (c) => {
