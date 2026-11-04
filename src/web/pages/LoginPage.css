@@ -1,19 +1,9 @@
-.login { min-height: 100vh; display: flex; flex-wrap: wrap; }
-.login-hero { flex: 1 1 480px; background: var(--c-login-panel); padding: 56px; display: flex; flex-direction: column; justify-content: space-between; gap: 48px; }
+.login { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--c-primary); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+.login-brand { align-self: center; }
 .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
-.login-pitch { display: flex; flex-direction: column; gap: 24px; max-width: 520px; }
-.login-pitch h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 56px; line-height: 1.02; letter-spacing: -0.02em; }
-.login-pitch p { margin: 0; font-size: 18px; line-height: 1.6; color: var(--c-text-ink); }
-.login-flow { display: flex; gap: 12px; flex-wrap: wrap; }
-.flow-card { background: #FFFFFF; border: 1px solid var(--c-login-card-border); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; min-width: 150px; }
-.flow-card span { font-size: 13px; color: var(--c-text-muted); }
-.flow-card strong { font-family: var(--font-display); font-size: 20px; }
-.flow-card--strong { background: var(--c-primary); border-color: var(--c-primary); color: #FFFFFF; }
-.flow-card--strong span { color: #DDE1FF; }
-.flow-arrow { display: flex; align-items: center; color: var(--c-primary); font-size: 22px; }
-.login-panel { flex: 1 1 480px; padding: 56px 24px; display: flex; align-items: center; justify-content: center; }
+.login-panel { width: 100%; padding: 56px 24px; display: flex; align-items: center; justify-content: center; }
 .login-box { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 28px; }
 .login-box h2 { margin: 0 0 10px; font-family: var(--font-display); font-weight: 700; font-size: 34px; letter-spacing: -0.01em; }
 .login-box p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--c-text-muted); }

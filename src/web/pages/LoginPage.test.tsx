@@ -28,15 +28,18 @@ function renderAt(status: number, body: unknown) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('LoginPage', () => {
-  it('affiche l’accroche, le bouton Google et l’avertissement d’invitation sans session', async () => {
+  it('affiche le logo, le bouton Google et l’avertissement d’invitation sans session, sans bloc d’accroche', async () => {
     renderAt(401, { error: 'unauthenticated', message: '' });
-    expect(await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Connexion' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Devis & Factures — accueil' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('button', { name: /Continuer avec Google/ })).toBeInTheDocument();
     expect(screen.getByText(/Accès sur invitation/)).toBeInTheDocument();
+    expect(screen.queryByText('Du devis signé à la facture payée, sans ressaisir une ligne.')).not.toBeInTheDocument();
   });
 
   it('lance la connexion Google avec les bonnes redirections', async () => {
     renderAt(401, { error: 'unauthenticated', message: '' });
-    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    await screen.findByRole('heading', { name: 'Connexion' });
     await userEvent.click(screen.getByRole('button', { name: /Continuer avec Google/ }));
     expect(social).toHaveBeenCalledWith({ provider: 'google', callbackURL: '/', errorCallbackURL: '/acces-refuse' });
   });
@@ -44,13 +47,13 @@ describe('LoginPage', () => {
   it('renvoie vers / si une session valide existe déjà', async () => {
     renderAt(200, { user: { id: 'u', email: 'a@b.c', name: 'A' }, isSuperadmin: false, onboarding: { templateRef: 'modele-01@1', profileComplete: true }, profileSummary: null });
     expect(await screen.findByText('Contenu protégé')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Connexion' })).not.toBeInTheDocument();
   });
 
   it('affiche un message d’indisponibilité si Google renvoie une erreur', async () => {
     social.mockResolvedValueOnce({ data: null, error: { message: 'oauth_failed' } });
     renderAt(401, { error: 'unauthenticated', message: '' });
-    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    await screen.findByRole('heading', { name: 'Connexion' });
     await userEvent.click(screen.getByRole('button', { name: /Continuer avec Google/ }));
     expect(await screen.findByRole('alert')).toHaveTextContent('La connexion Google est indisponible pour le moment. Réessayez plus tard ou contactez l’administrateur.');
   });
@@ -58,7 +61,7 @@ describe('LoginPage', () => {
   it('affiche un message d’indisponibilité si l’appel Google lève une exception', async () => {
     social.mockRejectedValueOnce(new Error('network down'));
     renderAt(401, { error: 'unauthenticated', message: '' });
-    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    await screen.findByRole('heading', { name: 'Connexion' });
     await userEvent.click(screen.getByRole('button', { name: /Continuer avec Google/ }));
     expect(await screen.findByRole('alert')).toHaveTextContent('La connexion Google est indisponible pour le moment. Réessayez plus tard ou contactez l’administrateur.');
   });
@@ -67,7 +70,7 @@ describe('LoginPage', () => {
     let resolveSocial: (value: { data: null; error: null }) => void = () => {};
     social.mockImplementationOnce(() => new Promise((resolve) => { resolveSocial = resolve; }));
     renderAt(401, { error: 'unauthenticated', message: '' });
-    await screen.findByRole('heading', { name: 'Du devis signé à la facture payée, sans ressaisir une ligne.' });
+    await screen.findByRole('heading', { name: 'Connexion' });
     const button = screen.getByRole('button', { name: /Continuer avec Google/ });
     await userEvent.click(button);
     expect(button).toBeDisabled();

@@ -26,22 +26,9 @@ export function LoginPage() {
   };
   return (
     <main className="login">
-      <section className="login-hero">
-        <Brand className="brand" nameClassName="brand-name" />
-        <div className="login-pitch">
-          <h1>Du devis signé à la facture payée, sans ressaisir une ligne.</h1>
-          <p>Vos coordonnées sont saisies une fois. Chaque devis accepté devient acompte, puis facture de solde, prête à imprimer.</p>
-        </div>
-        <div className="login-flow" aria-hidden="true">
-          <div className="flow-card"><span>Devis</span><strong>D-2026-014</strong></div>
-          <span className="flow-arrow">→</span>
-          <div className="flow-card"><span>Acompte 30 %</span><strong>F-2026-021</strong></div>
-          <span className="flow-arrow">→</span>
-          <div className="flow-card flow-card--strong"><span>Solde</span><strong>F-2026-027</strong></div>
-        </div>
-      </section>
       <section className="login-panel">
         <div className="login-box">
+          <Brand className="brand login-brand" nameClassName="brand-name" />
           <div>
             <h2>Connexion</h2>
             <p>Utilisez le compte Google associé à votre activité.</p>
