@@ -1,16 +1,17 @@
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--c-bg); color: var(--c-text); font-family: var(--font-body); }
+body { margin: 0; background: var(--c-bg); color: var(--c-text); font-family: var(--font-sans); }
 a { color: var(--c-text-soft); }
 a:hover { color: var(--c-text); }
-input, select, textarea { font-family: var(--font-body); color: var(--c-text); }
+input, select, textarea { font-family: inherit; color: var(--c-text); }
+button { font-family: inherit; }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--c-primary); outline-offset: 1px; }
 
-.page-title { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 34px; letter-spacing: -0.02em; }
+.page-title { margin: 0; font-weight: 700; font-size: 34px; letter-spacing: -0.02em; }
 .page-intro { margin: 0; font-size: 16px; line-height: 1.6; color: var(--c-text-muted); max-width: 660px; }
 .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-primary); }
 
 .card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-xl); padding: 22px; }
-.card-title { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 700; }
+.card-title { margin: 0; font-size: 19px; font-weight: 700; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
 .span-all { grid-column: 1 / -1; }
 

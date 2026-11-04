@@ -3,7 +3,7 @@
 .figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
 .figures > div { display: flex; flex-direction: column; gap: 4px; }
 .figures span { font-size: 14px; color: var(--c-text-muted); font-weight: 600; }
-.figures strong { font-family: var(--font-display); font-size: 26px; }
+.figures strong { font-size: 26px; }
 .figure-accent { color: var(--c-primary-strong); }
 .bill-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 18px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: nowrap; }
 .bill-card--draft { border: 1.5px dashed var(--c-placeholder); }

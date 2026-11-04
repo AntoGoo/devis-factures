@@ -144,7 +144,7 @@ export function ProfilePage({ mode }: { mode: 'onboarding' | 'settings' }) {
           return (
             <div key={s.series} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <span style={{ fontSize: 14, fontWeight: 600 }}>{title}</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20 }}>{s.next}</span>
+              <span style={{ fontWeight: 700, fontSize: 20 }}>{s.next}</span>
               <span className="field-hint" style={{ fontSize: 13 }}>prochain numéro{s.series === 'F' ? ' (acomptes et soldes)' : ''}</span>
               {field(key, 'Préfixe')}
               {s.startEditable && (

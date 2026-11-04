@@ -35,10 +35,7 @@
   --c-signin-control-border: #CBD3E3;
   --c-signin-control-border-hover: #B9C2D6;
   --c-signin-control-hover: #F7F8FC;
-  --font-signin-display: 'Space Grotesk', sans-serif;
-  --font-signin-body: Inter, system-ui, sans-serif;
-  --font-display: 'Bricolage Grotesque', sans-serif;
-  --font-body: Manrope, system-ui, sans-serif;
+  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   --radius-sm: 10px;
   --radius-md: 12px;
   --radius-lg: 16px;
