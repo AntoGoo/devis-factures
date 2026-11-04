@@ -6,7 +6,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RequireAuth } from './RequireAuth';
 
 function renderAt(status: number, body: unknown) {
-  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })));
+  renderWith(new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } }));
+}
+
+function renderWith(response: Response) {
+  vi.stubGlobal('fetch', vi.fn(async () => response));
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={qc}>
@@ -39,5 +43,17 @@ describe('RequireAuth', () => {
   it('affiche le contenu pour un utilisateur autorisé', async () => {
     renderAt(200, { user: { id: 'u', email: 'a@b.c', name: 'A' }, isSuperadmin: false, onboarding: { templateRef: 'modele-01@1', profileComplete: true }, profileSummary: null });
     expect(await screen.findByText('Contenu protégé')).toBeInTheDocument();
+  });
+
+  it('affiche une erreur au lieu de planter si /api/me renvoie une page HTML', async () => {
+    renderWith(new Response('<!doctype html><div id="root"></div>', { status: 200, headers: { 'content-type': 'text/html' } }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Réponse inattendue du serveur.');
+    expect(screen.queryByText('Contenu protégé')).not.toBeInTheDocument();
+  });
+
+  it('affiche une erreur au lieu de planter si /api/me renvoie un JSON incomplet', async () => {
+    renderAt(200, { user: { id: 'u', email: 'a@b.c', name: 'A' } });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Réponse inattendue du serveur.');
+    expect(screen.queryByText('Contenu protégé')).not.toBeInTheDocument();
   });
 });
