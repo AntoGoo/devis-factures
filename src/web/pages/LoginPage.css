@@ -13,7 +13,7 @@
 .signin-inner { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
 .signin-head { display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .signin-mark { width: 72px; height: 72px; border-radius: 20px; background: var(--c-signin-brand); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: var(--font-signin-display); font-weight: 700; font-size: 40px; box-shadow: 0 10px 24px rgba(47, 91, 234, 0.30); }
-.signin-title { margin: 0; font-family: var(--font-signin-display); font-weight: 700; font-size: 44px; line-height: 1.05; letter-spacing: -0.02em; color: var(--c-signin-ink); }
+.signin-title { margin: 0; font-family: var(--font-signin-body); font-weight: 700; font-size: 44px; line-height: 1.05; letter-spacing: -0.02em; color: var(--c-signin-ink); }
 .signin-subtitle { margin: 0; font-size: 17px; font-weight: 400; line-height: 1.5; color: var(--c-signin-text); }
 .signin-card { width: 100%; box-sizing: border-box; padding: 28px; border-radius: 16px; border: 1px solid var(--c-signin-border); background-color: var(--c-signin-bg); background-image: linear-gradient(320deg, var(--signin-gradient-stops)); box-shadow: 0 24px 60px rgba(27, 42, 74, 0.12); display: flex; flex-direction: column; gap: 16px; }
 .signin-google { height: 52px; width: 100%; background: #FFFFFF; border: 1px solid var(--c-signin-control-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: var(--font-signin-body); font-weight: 600; font-size: 16px; color: var(--c-signin-ink); cursor: pointer; }
