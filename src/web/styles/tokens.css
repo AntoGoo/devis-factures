@@ -24,6 +24,19 @@
   --c-neutral-soft: #E6E9F0;
   --c-placeholder: #B7BDCC;
   --c-avatar: #F2B544;
+  /* Page de connexion (maquette dédiée) */
+  --signin-gradient-stops: #D9E3FF 0%, #EEF2FB 45%, #F7F3FF 75%, #E4ECFF 100%;
+  --c-signin-bg: #EEF2FB;
+  --c-signin-brand: #2F5BEA;
+  --c-signin-ink: #1B2A4A;
+  --c-signin-text: #4A5878;
+  --c-signin-muted: #566381; /* maquette : #5B6886, assombri pour tenir 4,5:1 sur tout le dégradé */
+  --c-signin-border: #DCE2EE;
+  --c-signin-control-border: #CBD3E3;
+  --c-signin-control-border-hover: #B9C2D6;
+  --c-signin-control-hover: #F7F8FC;
+  --font-signin-display: 'Space Grotesk', sans-serif;
+  --font-signin-body: Inter, system-ui, sans-serif;
   --font-display: 'Bricolage Grotesque', sans-serif;
   --font-body: Manrope, system-ui, sans-serif;
   --radius-sm: 10px;

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router';
 import { authClient } from '../auth-client';
-import { Brand } from '../layout/Brand';
 import { useMe } from '../session/useMe';
 import './LoginPage.css';
 
@@ -25,15 +24,15 @@ export function LoginPage() {
     }
   };
   return (
-    <main className="login">
-      <section className="login-panel">
-        <div className="login-box">
-          <Brand className="brand login-brand" nameClassName="brand-name" />
-          <div>
-            <h2>Connexion</h2>
-            <p>Utilisez le compte Google associé à votre activité.</p>
-          </div>
-          <button type="button" className="google-button" onClick={signIn} disabled={pending}>
+    <main className="signin">
+      <div className="signin-inner">
+        <header className="signin-head">
+          <span className="signin-mark" aria-hidden="true">D</span>
+          <h1 className="signin-title">Devis &amp; Factures</h1>
+          <p className="signin-subtitle">Du devis signé à la facture envoyée, sans rien ressaisir.</p>
+        </header>
+        <section className="signin-card" aria-label="Connexion">
+          <button type="button" className="signin-google" onClick={signIn} disabled={pending}>
             <GoogleIcon />
             Continuer avec Google
           </button>
@@ -42,12 +41,9 @@ export function LoginPage() {
               La connexion Google est indisponible pour le moment. Réessayez plus tard ou contactez l’administrateur.
             </p>
           )}
-          <div className="notice">
-            <LockIcon />
-            <p>Accès sur invitation. Si votre adresse n’a pas encore été autorisée, contactez l’administrateur.</p>
-          </div>
-        </div>
-      </section>
+          <p className="signin-note">Accès réservé aux comptes ouverts par l’administrateur.</p>
+        </section>
+      </div>
     </main>
   );
 }
@@ -59,15 +55,6 @@ function GoogleIcon() {
       <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z" />
       <path fill="#FBBC05" d="M10.4 28.8c-.5-1.5-.8-3.1-.8-4.8s.3-3.3.8-4.8l-7.8-6C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.8-6z" />
       <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.7-4.2-13.6-9.9l-7.8 6C6.6 42.6 14.6 48 24 48z" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="4" y="11" width="16" height="10" rx="2" />
-      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
     </svg>
   );
 }

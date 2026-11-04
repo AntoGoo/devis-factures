@@ -4,7 +4,6 @@ import { render, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, expect, it, vi } from 'vitest';
-import { LoginPage } from '../pages/LoginPage';
 import { AppShell } from './AppShell';
 import { OnboardingLayout } from './OnboardingLayout';
 
@@ -25,10 +24,5 @@ it('le logo de la navigation principale ramène à l’accueil', async () => {
 
 it('le logo de l’accueil d’onboarding ramène à l’accueil', async () => {
   renderAt(<OnboardingLayout step={1}><p>Étape</p></OnboardingLayout>, '/bienvenue/modele');
-  expect(await brand()).toHaveAttribute('href', '/');
-});
-
-it('le logo de la page de connexion ramène à l’accueil', async () => {
-  renderAt(<LoginPage />, '/connexion');
   expect(await brand()).toHaveAttribute('href', '/');
 });

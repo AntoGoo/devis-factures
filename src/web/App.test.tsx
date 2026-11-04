@@ -11,7 +11,7 @@ const unauthenticated = () => vi.stubGlobal('fetch', vi.fn(async () => new Respo
 it('affiche la connexion quand personne n’est connecté', async () => {
   unauthenticated();
   render(<App />);
-  expect(await screen.findByRole('heading', { name: 'Connexion' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { level: 1, name: 'Devis & Factures' })).toBeInTheDocument();
 });
 
 it('affiche « Page introuvable » pour une adresse inconnue, avec un lien vers l’accueil', async () => {
